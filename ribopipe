@@ -30,16 +30,16 @@ main () {
 
 
 	echo "Assembling $reads against $database."
-#	reference_assemble
+	reference_assemble
 
   echo "Filtering with $filter."
-#	filter
+	filter
 	
 	echo "Generating tables with $make_tables."
-#	generate_tables
+	generate_tables
 	
 	echo "Summing up phylogenies with $count_phyl."
-#	count_phylogenies
+	count_phylogenies
 	
 	echo "Megaclustableing with $megaclustable."
 	make_megaclustables
@@ -102,12 +102,12 @@ count_phylogenies () {
 
 make_megaclustables () {
 	echo "Making Master Tables!"
-	$megaclustable -m "$tables/L_98_S_99/*.both.*" -t 6 -o $dir/species.txt
-	$megaclustable -m "$tables/L_98_S_95/*.both.*" -t 5 -o $dir/genus.txt
-	$megaclustable -m "$tables/L_98_S_90/*.both.*" -t 4 -o $dir/family.txt
-	$megaclustable -m "$tables/L_98_S_90/*.both.*" -t 3 -o $dir/order.txt
-	$megaclustable -m "$tables/L_98_S_90/*.both.*" -t 2 -o $dir/class.txt
-	$megaclustable -m "$tables/L_98_S_80/*.both.*" -t 1 -o $dir/phylum.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_99/*.both.* | tr -d ',\n') -t 6 -o $dir/species.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_95/*.both.* | tr -d ',\n') -t 5 -o $dir/genus.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 4 -o $dir/family.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 3 -o $dir/order.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $dir/class.txt
+	$megaclustable -m $(ls -m $tables/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $dir/phylum.txt
 }
 
 main
