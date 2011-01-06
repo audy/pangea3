@@ -28,27 +28,42 @@ main () {
   # Get total number of pairs
   # Since it's interleaved FASTQ, there should be 8 lines per pair
 
+	echo "Counting reads."
+	count_reads
+
   echo "Assembling $reads against $database."
-  reference_assemble
+  #reference_assemble
 
   echo "Filtering with $filter."
-  filter
+  #filter
   
   echo "Generating tables with $make_tables."
-  generate_tables
+  #generate_tables
   
   echo "Summing up phylogenies with $count_phyl."
-  count_phylogenies
+  #count_phylogenies
   
   echo "Megaclustableing with $megaclustable."
-  make_megaclustables
+  #make_megaclustables
   
   echo "Finished: $(date)."
+}
+
+count_reads() {
+	rm -f $dir/totals.txt
+	for $file in $reads/*.txt
+	do
+		wc -l $file >> $dir/totals.txt
+	done
 }
 
 reference_assemble () { 
   for file in $reads/*.txt
   do
+	
+	  # We need to count total pairs for each file
+
+	
     $assemble -o "$clc_out/$(basename $file).out" \
       -r random \
       -a global \
