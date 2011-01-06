@@ -30,19 +30,19 @@ main () {
 
 
 	echo "Assembling $file against $database."
-	echo reference_assemble
+	reference_assemble
 
   echo "Filtering with $filter."
-	echo filter
+	filter
 	
 	echo "Generating tables with $make_tables."
-	echo generate_tables
+	generate_tables
 	
 	echo "Summing up phylogenies with $count_phyl."
-	echo count_phylogenies
+	count_phylogenies
 	
 	echo "Megaclustableing with $megaclustable."
-	echo make_megaclustables
+	make_megaclustables
 	
 	echo "Finished: $(date)."
 }
