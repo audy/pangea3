@@ -19,23 +19,36 @@ tables=$1/tables # where the tables go
 database=$2 # the RDP database
 
 main () {
-	# Output date!
-	date
+	echo "Started: $(date)"
 	
 	# Make some directories
 	mkdir -p $clc_out
 	mkdir -p $tables
 	
-	reference_assemble
-	filter
-	generate_tables
-	count_phylogenies
-	make_megaclustables
+	# Get total number of pairs
+	# Since it's interleaved FASTQ, there should be 8 lines per pair
+  total=$(wc -l $file | awk '{print $1/8}' | )
+  echo "Counted $total pairs in $file."
+
+	echo "Assembling $file against $database."
+	echo reference_assemble
+
+  echo "Filtering with $filter."
+	echo filter
+	
+	echo "Generating tables with $make_tables."
+	echo generate_tables
+	
+	echo "Summing up phylogenies with $count_phyl."
+	echo count_phylogenies
+	
+	echo "Megaclustableing with $megaclustable."
+	echo make_megaclustables
+	
+	echo "Finished: $(date)."
 }
 
-# Reference Assemble:
 reference_assemble () { 
-	echo "Assembling"
 	for file in $reads/*.txt
 	do
 		$assemble -o "$clc_out/$(basename $file).out" \
@@ -49,7 +62,6 @@ reference_assemble () {
 }
 
 filter () {
-	# Filter
 	echo "Filtering"
 	for sim in 80 90 95 99
 	do
@@ -65,7 +77,6 @@ filter () {
 	done
 }
 
-# Generate Tables
 generate_tables() {
 	echo "Making Tables"
 	for sim in 80 90 95 99
@@ -78,9 +89,7 @@ generate_tables() {
 	done
 }
 
-# Count CLC Reference Assemblies Phylos.
 count_phylogenies () {
-
 	echo "Count Phylogenies"
 	for sim in 80 90 95 99
 	do
@@ -92,9 +101,7 @@ count_phylogenies () {
 	done
 }
 
-# Make "master" tables
 make_megaclustables () {
-
 	echo "Making Master Tables!"
 	$megaclustable -m $(ls -m $tables/L_98_S_99/*.both.* | tr -d ',\n') -t 6 -o $dir/species.txt
 	$megaclustable -m $(ls -m $tables/L_98_S_95/*.both.* | tr -d ',\n') -t 5 -o $dir/genus.txt
