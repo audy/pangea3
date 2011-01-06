@@ -51,7 +51,7 @@ main () {
 
 count_reads() {
 	rm -f $dir/totals.txt
-	for $file in $reads/*.txt
+	for file in $reads/*.txt
 	do
 		wc -l $file >> $dir/totals.txt
 	done
