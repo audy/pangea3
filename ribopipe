@@ -6,7 +6,7 @@
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
 make_tables="./src/clc/assembly_table"
-count_phyl="python src/phylocount.py"
+count_phyl="python src/phylo_count.py"
 megaclustable="perl src/megaclustable.pl"
 
 # Don't mess with anything below here, 
@@ -29,7 +29,7 @@ main () {
 	# Since it's interleaved FASTQ, there should be 8 lines per pair
 
 
-	echo "Assembling $file against $database."
+	echo "Assembling $reads against $database."
 	reference_assemble
 
   echo "Filtering with $filter."
