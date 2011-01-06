@@ -6,8 +6,8 @@
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
 make_tables="./src/clc/assembly_table"
-count_phyl="python phylocount.py"
-megaclustable="perl megaclustable.pl"
+count_phyl="python src/phylocount.py"
+megaclustable="perl src/megaclustable.pl"
 
 # Don't mess with anything below here, 
 # unless your name is Austin David-Richardson
