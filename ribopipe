@@ -2,15 +2,19 @@
 # run like this
 # ./pipeline.sh <directory> <database>
 
-# CONFIGURATION (You may edit)
+# ------------------------------ CONFIGURATION ------------------------------
+
+# So you can manually specify which python/perl you want to use.
+python=$(which python)
+perl=$(which perl)
+
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
 make_tables="./src/clc/assembly_table"
-count_phyl="python src/phylo_count.py"
-megaclustable="perl src/megaclustable.pl"
+count_phyl="$python src/phylo_count.py"
+megaclustable="$perl src/megaclustable.pl"
 
-# Don't mess with anything below here, 
-# unless your name is Austin David-Richardson
+# ---------------------------------------------------------------------------
 
 dir=$1 # working directory
 reads=$1/reads # where the reads are at
