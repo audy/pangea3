@@ -25,16 +25,12 @@ database=$2 # the RDP database
 main () {
   echo "Started: $(date)"
   
-  # Make some directories
   mkdir -p $clc_out
   mkdir -p $tables
   
-  # Get total number of pairs
-  # Since it's interleaved FASTQ, there should be 8 lines per pair
-
   echo "Assembling $reads against $database."
   reference_assemble
-
+  
   echo "Filtering with $filter."
   filter
   
