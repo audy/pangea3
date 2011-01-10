@@ -47,27 +47,24 @@ main () {
 }
 
 count_reads() {
-	rm -f $dir/totals.txt
-	for file in $reads/*.txt
-	do
-		wc -l $file >> $dir/totals.txt
-	done
+  rm -f $dir/totals.txt
+  for file in $reads/*.txt
+  do
+    wc -l $file >> $dir/totals.txt
+  done
 }
 
 reference_assemble () { 
   for file in $reads/*.txt
   do
-	
-	  # We need to count total pairs for each file
-
-	
-    $assemble -o "$clc_out/$(basename $file).out" \
-      -r random \
-      -a global \
-      -q -p fb ss 0 500 "$file" \
-      -d $database \
-      -l 0.5 \
-      -s 0.8
+  
+  $assemble -o "$clc_out/$(basename $file).out" \
+    -r random \
+    -a global \
+    -q -p fb ss 0 500 "$file" \
+    -d $database \
+    -l 0.5 \
+    -s 0.8
   done
 }
 
@@ -120,4 +117,5 @@ make_megaclustables () {
   $megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $dir/class.txt
   $megaclustable -m $(ls -m $tables/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $dir/phylum.txt
 }
+
 main
