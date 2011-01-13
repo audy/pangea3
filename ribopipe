@@ -32,42 +32,41 @@ tables=$1/tables # where the tables go
 database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
 
+# ---------------------------------------------------------------------------
+
+bar="----------------------------------------------------------------------"
+
 main () {
-  echo "Started: $(date)"
+  title "Started: $(date)"
+  echo "$bar"
+  echo "DIR = $dir"
+  echo "READS = $reads"
+  echo "CLC_OUT = $clc_out"
+  echo "TABLES = $tables"
+  echo "DATABASE = $database"
+  echo "SHANNON_READS = $shannon_reads"
   
   mkdir -p $clc_out
   mkdir -p $tables
   
-  echo "Assembling $reads against $database."
   reference_assemble
-  
-  echo "Filtering with $filter."
+
   filter
   
-  echo "Generating tables with $make_tables."
   generate_tables
   
-  echo "Summing up phylogenies with $count_phyl."
-  count_phylogenies($tables)
+  count_phylogenies $tables
   
-  echo "Megaclustableing with $megaclustable."
-  make_megaclustables($tables, $dir)
+  make_megaclustables $tables $dir
   
-  echo "Calculate Shannon Diversity Index with $shannon."
   run_shannon
-  
-  echo "Finished: $(date)."
-}
 
-count_reads () {
-  rm -f $dir/totals.txt
-  for file in $reads/*.txt
-  do
-    wc -l $file >> $dir/totals.txt
-  done
+  title "Finished: $(date)."
 }
 
 reference_assemble () { 
+  title "Assembling $reads against $database"
+
   for file in $reads/*.txt
   do
   
@@ -82,7 +81,7 @@ reference_assemble () {
 }
 
 filter () {
-  echo "Filtering"
+  title "Filtering with $filter"
   for sim in 80 90 95 99
   do
     for file in $clc_out/*.out
@@ -98,7 +97,7 @@ filter () {
 }
 
 generate_tables() {
-  echo "Making Tables"
+  title "Generating tables with $make_tables"
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
@@ -110,7 +109,7 @@ generate_tables() {
 }
 
 count_phylogenies () {
-  echo "Count Phylogenies: $1"
+  title "Summing up phylogenies with $count_phyl"
   table_dir=$1
   
   for sim in 80 90 95 99
@@ -124,8 +123,7 @@ count_phylogenies () {
 }
 
 make_megaclustables () {
-  echo "Making Master Tables! $table_dir // $out_dir"
-  
+  title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
   
@@ -138,17 +136,16 @@ make_megaclustables () {
 }
 
 run_shannon () {
-  echo "Shannon Diversity Indexing"
+  title "Shannon Diversity Indexing"
+
   mkdir -p $tables/shannon/
   for sim in 80 90 95 99
   do
     mkdir -p $tables/shannon/L_98_S_$sim
-    
     # Make files
     for file in $tables/L_98_S_$sim/*.table
     do
-      $pre_shannon $shannon_reads $file > $tables/shannon/L_98_S_$sim/$(basename $file)
-      continue
+      $pre_shannon $shannon_reads $file $tables/shannon/L_98_S_$sim/$(basename $file)
     done    
   done
   
@@ -165,4 +162,12 @@ run_shannon () {
   done
 }
 
+title () {
+  
+  purple="\033[0;35m"
+  nocolor="\033[0m"
+  echo "$bar"
+  echo -e $purple"$1"$nocolor
+  
+}
 main
