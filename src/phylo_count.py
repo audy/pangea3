@@ -108,10 +108,10 @@ print ' skipped = %s' % skipped
 
 with open('%s.unpaired.out' % sys.argv[2], 'w') as handle:
     for c in merged_counts:
-        print >> handle, '%s, %s' % (c, merged_counts[c])
+        print >> handle, '%s, %s' % (c.replace(',','_'), merged_counts[c])
     
 with open('%s.paired.out' % sys.argv[2], 'w') as handle:
     for hit in paired:
-        print >> handle, '%s, %s' % (rdp[hit], paired[hit])
+        print >> handle, '%s, %s' % (rdp[hit].replace(',','_'), paired[hit])
     
         
