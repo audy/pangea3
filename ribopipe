@@ -1,6 +1,13 @@
 #!/bin/bash +x
-# run like this
-# ./pipeline.sh <directory> <database>
+
+# ---------------------------------  USAGE -----------------------------------
+
+# ./ribopipe.sh <directory> <database> <shannon-reads>
+
+# - Directory contains reads
+# - Database is a TaxCollector database in FASTA format
+# - Shannon-reads is the number of reads to use to calculate the
+#     Shannon Diversity Index
 
 # ------------------------------ CONFIGURATION ------------------------------
 
@@ -13,6 +20,8 @@ filter="./src/clc/filter_matches"
 make_tables="./src/clc/assembly_table"
 count_phyl="$python src/phylo_count.py"
 megaclustable="$perl src/megaclustable.pl"
+pre_shannon="$python src/preshannon.py"
+shannon="$perl src/shannon.pl"
 
 # ---------------------------------------------------------------------------
 
@@ -21,6 +30,7 @@ reads=$1/reads # where the reads are at
 clc_out=$1/clc_out # where CLC's output goes
 tables=$1/tables # where the tables go
 database=$2 # the RDP database
+shannon_reads=$3 # number of reads for Shannon-Diversity Index
 
 main () {
   echo "Started: $(date)"
@@ -38,15 +48,18 @@ main () {
   generate_tables
   
   echo "Summing up phylogenies with $count_phyl."
-  count_phylogenies
+  count_phylogenies($tables)
   
   echo "Megaclustableing with $megaclustable."
-  make_megaclustables
+  make_megaclustables($tables, $dir)
+  
+  echo "Calculate Shannon Diversity Index with $shannon."
+  run_shannon
   
   echo "Finished: $(date)."
 }
 
-count_reads() {
+count_reads () {
   rm -f $dir/totals.txt
   for file in $reads/*.txt
   do
@@ -75,7 +88,7 @@ filter () {
     for file in $clc_out/*.out
     do     
       mkdir -p $clc_out/L_98_S_$sim
-
+      
       $filter -a $file \
          -l 0.98 \
          -s .$sim \
@@ -97,10 +110,12 @@ generate_tables() {
 }
 
 count_phylogenies () {
-  echo "Count Phylogenies"
+  echo "Count Phylogenies: $1"
+  table_dir=$1
+  
   for sim in 80 90 95 99
   do
-    for file in $tables/L_98_S_$sim/*.table
+    for file in $table_dir/L_98_S_$sim/*.table
     do
        $count_phyl $database $file
        cat $file.paired.out $file.unpaired.out > $file.both.out
@@ -109,13 +124,49 @@ count_phylogenies () {
 }
 
 make_megaclustables () {
-  echo "Making Master Tables!"
-  $megaclustable -m $(ls -m $tables/L_98_S_99/*.both.* | tr -d ',\n') -t 6 -o $dir/species.txt
-  $megaclustable -m $(ls -m $tables/L_98_S_95/*.both.* | tr -d ',\n') -t 5 -o $dir/genus.txt
-  $megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 4 -o $dir/family.txt
-  $megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 3 -o $dir/order.txt
-  $megaclustable -m $(ls -m $tables/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $dir/class.txt
-  $megaclustable -m $(ls -m $tables/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $dir/phylum.txt
+  echo "Making Master Tables! $table_dir // $out_dir"
+  
+  table_dir=$1
+  out_dir=$2
+  
+  $megaclustable -m $(ls -m $table_dir/L_98_S_99/*.both.* | tr -d ',\n') -t 6 -o $out_dir/species.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_95/*.both.* | tr -d ',\n') -t 5 -o $out_dir/genus.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 4 -o $out_dir/family.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 3 -o $out_dir/order.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $out_dir/class.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $out_dir/phylum.txt
+}
+
+run_shannon () {
+  echo "Shannon Diversity Indexing"
+  mkdir -p $tables/shannon/
+  for sim in 80 90 95 99
+  do
+    mkdir -p $tables/shannon/L_98_S_$sim
+    
+    # Make files
+    for file in $tables/L_98_S_$sim/*.table
+    do
+      $pre_shannon $shannon_reads $file > $tables/shannon/L_98_S_$sim/$(basename $file)
+    done    
+  done
+  
+  # Run Phylocount
+  count_phylogenies "$tables/shannon"    
+  
+  # Run Megaclustable
+  make_megaclustables "$tables/shannon" "$tables/shannon/"
+  
+  # Run shannon.pl on our standardized tables
+  for filename in $tables/shannon/*.txt
+  do
+    $shannon -t $filename >> $filename
+  done
+  
+  #		-t hybrid table input file
+  #		-n number of samples
+  #		-o output name
+
 }
 
 main
