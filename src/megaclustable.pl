@@ -114,6 +114,10 @@ open OUTPUT, ">$output" or die $!;
 for($a = 0; $a < $numMega; $a++)
 {
   $filename = basename($megaclustFile[$a]);
+  @t = split(/\./, $filename);
+  $filename = $t[0];
+
+
 	print OUTPUT "\t$filename";
 }
 for($a = 0; $a < $size; $a++)
