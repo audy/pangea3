@@ -23,6 +23,8 @@ megaclustable="$perl src/megaclustable.pl"
 pre_shannon="$python src/preshannon.py"
 shannon="$perl src/shannon.pl"
 
+set -e # script dies if anything exits in error.
+
 # ---------------------------------------------------------------------------
 
 dir=$1 # working directory
