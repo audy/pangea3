@@ -33,7 +33,7 @@ database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
 
 # ---------------------------------------------------------------------------
-bar = "----------------------------------------------------------------------"
+bar="----------------------------------------------------------------------"
 
 main () {
   title "Started: $(date)"
@@ -162,11 +162,10 @@ run_shannon () {
 }
 
 title () {
-  
   purple="\033[0;35m"
   nocolor="\033[0m"
   echo "$bar"
   echo -e $purple"$1"$nocolor
-  
 }
+
 main
