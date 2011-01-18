@@ -134,6 +134,7 @@ make_megaclustables () {
   $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 3 -o $out_dir/order.txt
   $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $out_dir/class.txt
   $megaclustable -m $(ls -m $table_dir/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $out_dir/phylum.txt
+  $megaclustable -m $(ls -m $table_dir/L_98_S_80/*.both.* | tr -d ',\n') -t 0 -o $out_dir/domain.txt
 }
 
 run_shannon () {
