@@ -41,11 +41,6 @@ for($a = 0; $a <= $#ARGV; $a++)
 		$mIN = "false";
 		$a++;
 		$taxLevel = $ARGV[$a];
-		if($taxLevel > 10 || $taxLevel < 0)
-		{
-			print "You must enter a number between 0 and 7 for taxonomy level where 0 = kingdom and 6 = strain.\n";
-			exit;
-		}
 		$taxLevel = "["."$taxLevel"."]";
 	}
 	elsif($mIn eq "true")
