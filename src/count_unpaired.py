@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+# Counts reads per hit in RDP database given the RDP database and the CLC
+# reference assembly output!
+
+# Usage: python count_unpaired.py <database> <clc table> > out.csv
+
 import sys
 from collections import defaultdict
 
