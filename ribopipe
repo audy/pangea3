@@ -59,6 +59,9 @@ main () {
   count_phylogenies $tables
   
   make_megaclustables $tables $dir
+
+  mkdir $dir/unpaired/
+  make_megaclustables $tables $dir/unpaired/
   
   run_shannon
 
