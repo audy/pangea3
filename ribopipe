@@ -22,7 +22,7 @@ count_phyl="$python src/phylo_count.py"
 megaclustable="$perl src/megaclustable.pl"
 pre_shannon="$python src/preshannon.py"
 shannon="$perl src/shannon.pl"
-
+unassembled_reads="src/clc/unassembled_reads"
 set -e # script dies if anything exits in error.
 
 # ---------------------------------------------------------------------------
@@ -33,6 +33,7 @@ clc_out=$1/clc_out # where CLC's output goes
 tables=$1/tables # where the tables go
 database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
+unassembled=$1/reads/unassembled # Where unassembled reads are kept
 
 # ---------------------------------------------------------------------------
 bar="----------------------------------------------------------------------"
@@ -49,6 +50,7 @@ main () {
   
   mkdir -p $clc_out
   mkdir -p $tables
+  mkdir -p $unassembled
   
   reference_assemble
   
@@ -103,8 +105,15 @@ generate_tables() {
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
-      mkdir -p $tables/L_98_S_$sim 
+      # Generate tables for each percent similarity
+      mkdir -p $tables/L_98_S_$sim
       $make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
+      
+      # Output unassembled reads for each percent similarity
+      mkdir -p $unassembled/L_98_S_$sim
+      $unassembled_reads \
+         -a assembly $file \
+         -o output $unassembled/L_98_S_$sim/$output/$(basename file).fa \
     done
   done
 }
