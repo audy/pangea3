@@ -1,4 +1,4 @@
-task :default => ['src/cdhit/cd-hit-est'] {}
+task :default => ['src/cdhit/cd-hit-est'] 
 
 file 'src/cdhit/cd-hit-est' do
   puts 'Building CD-HIT'
