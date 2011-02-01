@@ -62,7 +62,7 @@ main () {
   
   make_megaclustables $tables $dir
   
-  run_shannon
+#  run_shannon
   
   title "Finished: $(date)."
 }
@@ -113,7 +113,7 @@ generate_tables() {
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -a assembly $file \
-         -o output $unassembled/L_98_S_$sim/$output/$(basename file).fa \
+         -o output $unassembled/L_98_S_$sim/$output/$(basename file).fa
     done
   done
 }
