@@ -69,7 +69,7 @@ main () {
   
 #  count_phylogenies $tables  
   
-#  make_megaclustables $tables $dir
+  make_megaclustables $tables $dir
   
 #  run_shannon # on clustered reads!
   
@@ -125,6 +125,7 @@ generate_tables() {
       # Output unassembled reads for each percent similarity
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
+         -p \
          -a $file \
          -o $unassembled/L_98_S_$sim/$(basename $file).fa
       
@@ -226,17 +227,19 @@ run_shannon () {
 title () {
   purple="\033[0;35m"
   nocolor="\033[0m"
-  msg="$purple>>>$nocolor $1"
-  echo -e $msg
-  echo $msg >> $logfile
+  c="$purple>>>$nocolor"
+  d=">>>"
+  echo -e $c $1
+  echo $d $1 >> $logfile
 }
 
 status () {
   green="\033[0;36m"
   nocolor="\033[0m"
-  msg="[$green*$nocolor] $1" 
-  echo -e $msg
-  echo $msg >> $logfile
+  c="[$green*$nocolor] $1" 
+  d="[*]"
+  echo -e $c $1
+  echo $d $1 >> $logfile
 }
 
 main
