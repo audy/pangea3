@@ -59,17 +59,17 @@ main () {
   mkdir -p $tables
   mkdir -p $unassembled
   
-  reference_assemble
+#  reference_assemble
   
-  filter
+#  filter
   
-  generate_tables
+#  generate_tables
   
-  cluster_unassembled
+#  cluster_unassembled
   
-  count_phylogenies $tables  
+#  count_phylogenies $tables  
   
-  make_megaclustables $tables $dir
+#  make_megaclustables $tables $dir
   
 #  run_shannon # on clustered reads!
   
@@ -119,7 +119,7 @@ generate_tables() {
     do
       # Generate tables for each percent similarity
       mkdir -p $tables/L_98_S_$sim
-      #$make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
+      $make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
       
       status "Getting unassembled reads from $(basename $file) @ $sim%"
       # Output unassembled reads for each percent similarity
@@ -226,7 +226,7 @@ run_shannon () {
 title () {
   purple="\033[0;35m"
   nocolor="\033[0m"
-  msg="$purple>>>$nocolor "$1" $purple <<<$nocolor
+  msg="$purple>>>$nocolor $1"
   echo -e $msg
   echo $msg >> $logfile
 }
