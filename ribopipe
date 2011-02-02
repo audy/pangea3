@@ -14,6 +14,7 @@ set -e # script dies if anything exits in error.
 # So you can manually specify which python/perl you want to use.
 python=$(which python)
 perl=$(which perl)
+cores='16'
 
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
@@ -25,9 +26,10 @@ shannon="$perl src/shannon.pl"
 unassembled_reads="src/clc/unassembled_reads"
 label_fasta="python src/label_fasta.py"
 cdhit="src/cdhit/cd-hit-est"
-cores='2'
+cdhit_overhang="78"
+
 # To get number of cores automatically, uncomment:
-cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
+#cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
 
 # ---------------------------------------------------------------------------
 
@@ -64,10 +66,10 @@ main () {
 #  filter
   
 #  generate_tables
-
-  filter_unassembled
-
-#  cluster_unassembled
+  
+#  separate_unassembled
+  
+  cluster_unassembled
   
 #  count_phylogenies $tables  
   
@@ -116,6 +118,7 @@ generate_tables() {
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
+      status "$(basename $file) => $sim%"
       # Generate tables for each percent similarity
       mkdir -p $tables/L_98_S_$sim
       $make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
@@ -123,24 +126,32 @@ generate_tables() {
   done
 }
 
-filter_unassembled() {
-  title "Filtering/labelling unassembled reads"
+separate_unassembled() {
+  title "Separating/labelling unassembled reads"
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
-      status "Filtering $(basename $file) @ $sim%"
+      status "Separating $(basename $file) @ $sim%"
       # Output unassembled reads for each percent similarity
+      rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
+      
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -p \
          -a $file \
          -o $unassembled/L_98_S_$sim/$(basename $file).fa
-    
+      
       status "Labelling $(basename $file) (run: $run)"
+      
       # Concatenate unassembled reads while adding ids to header
-      $label_fasta $unassembled/L_98_S_$sim/$(basename $file).fa $run >> \
-        $unassembled/unassembled_"$sim".fa
+      # Reads have to go together a certain way to be clustered
+      # 5'-read1-3' + 3'-read2-5'
+      rm -f $unassembled/unassembled_"$sim".fa # Clean
+      $label_fasta \
+        $unassembled/L_98_S_$sim/$(basename $file).fa \
+        $run \
+        >> $unassembled/unassembled_"$sim".fa
     done
   done
 }
@@ -150,18 +161,19 @@ cluster_unassembled() {
   
   for sim in 80 90 95 99
   do
-    rm -f $unassembled/unassembled_"$sim".fa # Just in case it already exists
-    for file in $clc_out/L_98_S_$sim/*.filtered
-    do
-      status "Clustering @ $sim%"
-      $cdhit \
-        -i $unassembled/unassembled_$sim.fa \
-        -o $unassembled/clustered_$sim.fa \
-        -c 0.$sim \
-        -n $cores   \
-        -g 1 > /dev/null
-    done
-    rm -r $unassembled/L_98_S_$sim/
+    status "Clustering @ $sim% (s = $cdhit_overhang%)"    
+    input=$unassembled/unassembled_$sim.fa
+    output=$unassembled/clustered_$sim.fa
+    
+    cdhit $input $out 80 5
+    $cdhit \
+      -i $input \
+      -o $output \
+      -c 0.$sim \
+      -n $word \
+      -T $cores \
+      -s 0.$cdhit_overhang \
+      -g 1 > /dev/null  
   done
 }
 
