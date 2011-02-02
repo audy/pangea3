@@ -1,5 +1,5 @@
 #!/bin/bash +x
-
+set -e # script dies if anything exits in error.
 # --------------------------------- USAGE -----------------------------------
 
 # ./ribopipe.sh <directory> <database> <shannon-reads>
@@ -23,7 +23,10 @@ megaclustable="$perl src/megaclustable.pl"
 pre_shannon="$python src/preshannon.py"
 shannon="$perl src/shannon.pl"
 unassembled_reads="src/clc/unassembled_reads"
-set -e # script dies if anything exits in error.
+cdhit="src/cdhit/cd-hit-est"
+cores='2'
+# To get number of cores automatically, uncomment:
+#cores=`system_profiler|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
 
 # ---------------------------------------------------------------------------
 
@@ -47,6 +50,7 @@ main () {
   echo "TABLES = $tables"
   echo "DATABASE = $database"
   echo "SHANNON_READS = $shannon_reads"
+  echo "CORES = $cores"
   
   mkdir -p $clc_out
   mkdir -p $tables
@@ -56,13 +60,15 @@ main () {
   
 #  filter
   
-  generate_tables
+#  generate_tables
+  
+  cluster_unassembled
   
 #  count_phylogenies $tables  
   
 #  make_megaclustables $tables $dir
   
-#  run_shannon
+#  run_shannon # on clustered reads!
   
   title "Finished: $(date)."
 }
@@ -100,7 +106,7 @@ filter () {
 }
 
 generate_tables() {
-  title "Generating tables with $make_tables"
+  title "Generating tables with $make_tables\nFiltering unassembled reads"
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
@@ -113,9 +119,29 @@ generate_tables() {
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -a $file \
-         -o $unassembled/L_98_S_$sim/$output/$(basename $file).fa 
+         -o $unassembled/L_98_S_$sim/$(basename $file).fa
     done
   done
+}
+
+cluster_unassembled() {
+  title "Clustering unassembled reads with $cdhit"
+  
+  for sim in 80 90 95 99
+  do
+    for file in $unassembled/L_98_S_$sim/*.fa
+    do
+      echo $sim
+      mkdir -p $unassembled/L_98_S_$sim/clustered/
+      $cdhit \
+        -i $file \
+        -o $unassembled/L_98_S_$sim/clustered/$(basename $file).fa \
+        -c 0.$sim \
+        -n $cores   \
+        -g 1 > /dev/null
+    done
+  done
+  
 }
 
 count_phylogenies () {
