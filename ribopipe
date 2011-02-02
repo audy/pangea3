@@ -27,7 +27,7 @@ label_fasta="python src/label_fasta.py"
 cdhit="src/cdhit/cd-hit-est"
 cores='2'
 # To get number of cores automatically, uncomment:
-#cores=`system_profiler|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
+cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
 
 # ---------------------------------------------------------------------------
 
