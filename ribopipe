@@ -39,7 +39,7 @@ database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
 run=$4 # This gets added to the headers of the unmatched reads (ugly patch)
 unassembled=$1/reads/unassembled # Where unassembled reads are kept
-logfile=$1/log.txt
+logfile=$dir/log.txt
 
 # ---------------------------------------------------------------------------
 bar="----------------------------------------------------------------------"
@@ -61,17 +61,17 @@ main () {
   mkdir -p $tables
   mkdir -p $unassembled
   
-#  reference_assemble
+  reference_assemble
   
-#  filter
+  filter
   
-#  generate_tables
+  generate_tables
   
   cluster_unassembled
   
-#  count_phylogenies $tables  
+  count_phylogenies $tables  
   
-#  make_megaclustables $tables $dir
+  make_megaclustables $tables $dir
   
 #  run_shannon # on clustered reads!
   
@@ -230,7 +230,7 @@ title () {
   nocolor="\033[0m"
   msg="$bar\n"$purple"$1"$nocolor
   echo -e $msg
-  echo $msg >> $log
+  echo $msg >> $logfile
 }
 
 status () {
@@ -238,7 +238,7 @@ status () {
   nocolor="\033[0m"
   msg="[$green*$nocolor] $1" 
   echo -e $msg
-  echo $msg >> $log
+  echo $msg >> $logfile
 }
 
 main
