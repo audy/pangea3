@@ -23,6 +23,7 @@ megaclustable="$perl src/megaclustable.pl"
 pre_shannon="$python src/preshannon.py"
 shannon="$perl src/shannon.pl"
 unassembled_reads="src/clc/unassembled_reads"
+label_fasta="python src/label_fasta.py"
 cdhit="src/cdhit/cd-hit-est"
 cores='2'
 # To get number of cores automatically, uncomment:
@@ -36,21 +37,25 @@ clc_out=$1/clc_out # where CLC's output goes
 tables=$1/tables # where the tables go
 database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
+run=$4 # This gets added to the headers of the unmatched reads (ugly patch)
 unassembled=$1/reads/unassembled # Where unassembled reads are kept
+logfile=$1/log.txt
 
 # ---------------------------------------------------------------------------
 bar="----------------------------------------------------------------------"
 
 main () {
   title "Started: $(date)"
-  echo "$bar"
-  echo "DIR = $dir"
-  echo "READS = $reads"
-  echo "CLC_OUT = $clc_out"
-  echo "TABLES = $tables"
-  echo "DATABASE = $database"
-  echo "SHANNON_READS = $shannon_reads"
-  echo "CORES = $cores"
+  status "$bar"
+  status "DIR = $dir"
+  status "READS = $reads"
+  status "RUN = $run"
+  status "CLC_OUT = $clc_out"
+  status "TABLES = $tables"
+  status "DATABASE = $database"
+  status "SHANNON_READS = $shannon_reads"
+  status "CORES = $cores"
+  status "LOGFILE = $logfile"
   
   mkdir -p $clc_out
   mkdir -p $tables
@@ -78,14 +83,14 @@ reference_assemble () {
 
   for file in $reads/*.txt
   do
-  
-  $assemble -o "$clc_out/$(basename $file).out" \
-    -r random \
-    -a global \
-    -q -p fb ss 0 500 "$file" \
-    -d $database \
-    -l 0.5 \
-    -s 0.8
+    status "Assembling $(basename $file) against $database"
+    $assemble -o "$clc_out/$(basename $file).out" \
+      -r random \
+      -a global \
+      -q -p fb ss 0 500 "$file" \
+      -d $database \
+      -l 0.5 \
+      -s 0.8
   done
 }
 
@@ -96,7 +101,7 @@ filter () {
     for file in $clc_out/*.out
     do     
       mkdir -p $clc_out/L_98_S_$sim
-      
+      status "Filtering $(basename $file) @ $sim%"
       $filter -a $file \
          -l 0.98 \
          -s .$sim \
@@ -106,21 +111,33 @@ filter () {
 }
 
 generate_tables() {
-  title "Generating tables with $make_tables\nFiltering unassembled reads"
+  title "Generating tables with $make_tables and \n filtering unassembled reads"
   for sim in 80 90 95 99
   do
+    
+    rm -f $unassembled/unassembled_"$sim".fa # Just in case it already exists
+    
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
       # Generate tables for each percent similarity
       mkdir -p $tables/L_98_S_$sim
       #$make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
       
+      status "Getting unassembled reads from $(basename $file) @ $sim%"
       # Output unassembled reads for each percent similarity
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -a $file \
          -o $unassembled/L_98_S_$sim/$(basename $file).fa
+      
+      status "Labelling unassembled reads from $(basename $file)"
+      # Concatenate unassembled reads while adding ids to header
+      $label_fasta $unassembled/L_98_S_$sim/$(basename $file).fa $run >> \
+        $unassembled/unassembled_"$sim".fa
     done
+    
+    rm -r $unassembled/L_98_S_$sim/
+    
   done
 }
 
@@ -129,17 +146,13 @@ cluster_unassembled() {
   
   for sim in 80 90 95 99
   do
-    for file in $unassembled/L_98_S_$sim/*.fa
-    do
-      echo $sim
-      mkdir -p $unassembled/L_98_S_$sim/clustered/
-      $cdhit \
-        -i $file \
-        -o $unassembled/L_98_S_$sim/clustered/$(basename $file).fa \
-        -c 0.$sim \
-        -n $cores   \
-        -g 1 > /dev/null
-    done
+    status "Clustering @ $sim%"
+    $cdhit \
+      -i $unassembled/unassembled_$sim.fa \
+      -o $unassembled/clustered_$sim.fa \
+      -c 0.$sim \
+      -n $cores   \
+      -g 1 > /dev/null
   done
   
 }
@@ -152,8 +165,9 @@ count_phylogenies () {
   do
     for file in $table_dir/L_98_S_$sim/*.table
     do
-       $count_phyl $database $file
-       cat $file.paired.out $file.unpaired.out > $file.both.out
+      status "Counting $(basename $file) @ $sim%"
+      $count_phyl $database $file
+      cat $file.paired.out $file.unpaired.out > $file.both.out
      done
   done
 }
@@ -163,13 +177,25 @@ make_megaclustables () {
   table_dir=$1
   out_dir=$2
   
-  $megaclustable -m $(ls -m $table_dir/L_98_S_99/*.both.* | tr -d ',\n') -t 6 -o $out_dir/species.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_95/*.both.* | tr -d ',\n') -t 5 -o $out_dir/genus.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 4 -o $out_dir/family.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 3 -o $out_dir/order.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_90/*.both.* | tr -d ',\n') -t 2 -o $out_dir/class.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_80/*.both.* | tr -d ',\n') -t 1 -o $out_dir/phylum.txt
-  $megaclustable -m $(ls -m $table_dir/L_98_S_80/*.both.* | tr -d ',\n') -t 0 -o $out_dir/domain.txt
+  megaclustable 99 6 species
+  megaclustable 95 5 genus
+  megaclustable 90 4 family
+  megaclustable 90 3 order
+  megaclustable 90 2 class
+  megaclustable 80 1 phylum
+  megaclustable 80 0 domain
+}
+
+megaclustable() {
+    sim=$1
+    t=$2
+    out=$3
+    
+    status "Megaclustable $out: $sim%, t=$t"
+    $megaclustable \
+      -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
+      -t $t \
+      -o $out_dir/$out.txt  
 }
 
 run_shannon () {
@@ -202,8 +228,17 @@ run_shannon () {
 title () {
   purple="\033[0;35m"
   nocolor="\033[0m"
-  echo "$bar"
-  echo -e $purple"$1"$nocolor
+  msg="$bar\n"$purple"$1"$nocolor
+  echo -e $msg
+  echo $msg >> $log
+}
+
+status () {
+  green="\033[0;36m"
+  nocolor="\033[0m"
+  msg="[$green*$nocolor] $1" 
+  echo -e $msg
+  echo $msg >> $log
 }
 
 main
