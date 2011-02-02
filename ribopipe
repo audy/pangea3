@@ -52,17 +52,17 @@ main () {
   mkdir -p $tables
   mkdir -p $unassembled
   
-  reference_assemble
+#  reference_assemble
   
-  filter
+#  filter
   
   generate_tables
   
-  count_phylogenies $tables  
+#  count_phylogenies $tables  
   
-  make_megaclustables $tables $dir
+#  make_megaclustables $tables $dir
   
-  run_shannon
+#  run_shannon
   
   title "Finished: $(date)."
 }
@@ -107,13 +107,13 @@ generate_tables() {
     do
       # Generate tables for each percent similarity
       mkdir -p $tables/L_98_S_$sim
-      $make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
+      #$make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
       
       # Output unassembled reads for each percent similarity
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
-         -a assembly $file \
-         -o output $unassembled/L_98_S_$sim/$output/$(basename file).fa \
+         -a $file \
+         -o $unassembled/L_98_S_$sim/$output/$(basename $file).fa 
     done
   done
 }
