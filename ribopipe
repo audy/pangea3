@@ -42,11 +42,9 @@ unassembled=$1/reads/unassembled # Where unassembled reads are kept
 logfile=$dir/log.txt
 
 # ---------------------------------------------------------------------------
-bar="----------------------------------------------------------------------"
 
 main () {
-  title "Started: $(date)"
-  status "$bar"
+  title "$(date)"
   status "DIR = $dir"
   status "READS = $reads"
   status "RUN = $run"
@@ -75,7 +73,7 @@ main () {
   
 #  run_shannon # on clustered reads!
   
-  title "Finished: $(date)."
+  title "$(date)."
 }
 
 reference_assemble () { 
@@ -228,7 +226,7 @@ run_shannon () {
 title () {
   purple="\033[0;35m"
   nocolor="\033[0m"
-  msg="$bar\n"$purple"$1"$nocolor
+  msg="$purple>>>$nocolor "$1" $purple <<<$nocolor
   echo -e $msg
   echo $msg >> $logfile
 }
