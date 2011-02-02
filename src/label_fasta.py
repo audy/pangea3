@@ -16,6 +16,6 @@ else:
 with open(sys.argv[1]) as handle:
     for line in handle:
         if line.startswith('>'):
-            print '%s:%s:%s' % (line.strip(), h, add)
+            print '%s:%s' % (line.strip(), h, add)
         else:
             print line.strip()
