@@ -125,7 +125,11 @@ generate_tables() {
       status "$(basename $file) => $sim%"
       # Generate tables for each percent similarity
       mkdir -p $tables/L_98_S_$sim
-      $make_tables -n -p -s $file > $tables/L_98_S_$sim/$(basename $file).table
+      $make_tables \
+        -n \
+        -p \
+        -s $file \
+        > $tables/L_98_S_$sim/$(basename $file).table
     done
   done
 }
@@ -179,7 +183,8 @@ cluster_unassembled() {
       -n $wordsize \
       -T $cores \
       -s 0.$cdhit_overhang \
-      -g 1 > /dev/null
+      -g 1 \
+      > /dev/null
       
     thismany=`grep -c '^>' $unassembled/clustered_$sim.fa`
     status "$sim% => $thismany clusters"
@@ -237,7 +242,10 @@ run_shannon () {
     # Make files
     for file in $tables/L_98_S_$sim/*.table
     do
-      $pre_shannon $shannon_reads $file $tables/shannon/L_98_S_$sim/$(basename $file)
+      $pre_shannon \
+        $shannon_reads \
+        $file \
+        $tables/shannon/L_98_S_$sim/$(basename $file)
     done    
   done
   
