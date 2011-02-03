@@ -161,12 +161,14 @@ separate_unassembled() {
 }
 
 cluster_unassembled() {
+  wordsize=10
+  
   title "Clustering unassembled reads with $cdhit"
   status "Overhang = $cdhit_overhang"
+  status "Wordsize = $wordsize"
+  
   for sim in 80 90 95 99
   do
-    thismany=`grep -c '^>' $unassembled/clustered_$sim.fa`
-    status "$sim% => $thismany clusters"
     input=$unassembled/unassembled_$sim.fa
     output=$unassembled/clustered_$sim.fa
     
@@ -174,10 +176,13 @@ cluster_unassembled() {
       -i $input \
       -o $output \
       -c 0.$sim \
-      -n 8 \
+      -n $wordsize \
       -T $cores \
       -s 0.$cdhit_overhang \
       -g 1 > /dev/null
+      
+    thismany=`grep -c '^>' $unassembled/clustered_$sim.fa`
+    status "$sim% => $thismany clusters"
   done
 }
 
