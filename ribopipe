@@ -162,13 +162,13 @@ separate_unassembled() {
 
 cluster_unassembled() {
   title "Clustering unassembled reads with $cdhit"
-
-  for sim in 80
+  status "Overhang = $cdhit_overhang"
+  for sim in 80 90 95 99
   do
-    status "Clustering @ $sim% (s = $cdhit_overhang%)"    
+    status "Clustering @ $sim% yielded " \ 
+      "`grep -c '^>' $unassembled/clustered_$sim.fa` clusters"
     input=$unassembled/unassembled_$sim.fa
     output=$unassembled/clustered_$sim.fa
-    status "Yielded `grep -c '^>' $unassembled/clustered_$sim.fa` clusters"
     
     $cdhit \
       -i $input \
