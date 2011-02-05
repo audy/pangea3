@@ -227,7 +227,7 @@ count_phylogenies () {
 
 concatenate_taxa_and_clusters () {
   
-  
+  title "concatenate taxa and clusters"
   
 }
 
