@@ -13,22 +13,26 @@ set -o nounset
 
 # ------------------------------ CONFIGURATION ------------------------------
 
+cdhit_overhang="78"
+
 # So you can manually specify which python/perl you want to use.
 python=$(which python)
 perl=$(which perl)
 cores='16'
 
+unassembled_reads="src/clc/unassembled_reads"
+
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
 make_tables="./src/clc/assembly_table"
+cdhit="src/cdhit/cd-hit-est"
+
 count_phyl="$python src/phylo_count.py"
 megaclustable="$perl src/megaclustable.pl"
 pre_shannon="$python src/preshannon.py"
 shannon="$perl src/shannon.pl"
-unassembled_reads="src/clc/unassembled_reads"
-label_fasta="python src/label_fasta.py"
-cdhit="src/cdhit/cd-hit-est"
-cdhit_overhang="78"
+count_clusters="$python src/count_clusters.py"
+label_fasta="$python src/label_fasta.py"
 
 # To get number of cores automatically, uncomment:
 #cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
@@ -67,13 +71,17 @@ main () {
   
 #  filter
   
-#  generate_tables
-  
 #  separate_unassembled
   
-  cluster_unassembled
+#  cluster_unassembled
   
-#  count_phylogenies $tables  
+  make_cluster_tables
+  
+#  generate_tables
+  
+#  count_phylogenies $tables
+
+#  concatenate_taxa_and_clusters
   
 #  make_megaclustables $tables $dir
   
@@ -136,30 +144,30 @@ generate_tables() {
 
 separate_unassembled() {
   title "Separating/labelling unassembled reads"
+  status "Label = $run"
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
-      status "Separating $(basename $file) @ $sim%"
+      status "Separating $(basename $file) @ $sim"
       # Output unassembled reads for each percent similarity
       rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
-      
+      rm -f $unassembled/unassembled_"$sim".fa # Clean
+            
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -p \
          -a $file \
-         -o $unassembled/L_98_S_$sim/$(basename $file).fa
-      
-      status "Labelling $(basename $file) (run: $run)"
-      
-      # Concatenate unassembled reads while adding ids to header
-      # Reads have to go together a certain way to be clustered
-      # 5'-read1-3' + 3'-read2-5'
-      rm -f $unassembled/unassembled_"$sim".fa # Clean
-      $label_fasta \
-        $unassembled/L_98_S_$sim/$(basename $file).fa \
-        $run \
-        >> $unassembled/unassembled_"$sim".fa
+         -o /dev/stdout | \
+
+         # Concatenate unassembled reads while adding ids to header
+         # Reads have to go together a certain way to be clustered
+         # 5'-read1-3' + 3'-read2-5'
+         
+         $label_fasta \
+           $unassembled/L_98_S_$sim/$(basename $file).fa \
+           $run \
+           >> $unassembled/unassembled_"$sim".fa
     done
   done
 }
@@ -191,6 +199,17 @@ cluster_unassembled() {
   done
 }
 
+make_cluster_tables() {
+  title "Building cluster tables"
+  
+  for sim in 80 90 95 99
+  do
+    file=$unassembled/clustered_$sim.fa.bak.clstr
+    status "Counting $file"
+    $count_clusters $file > $tables/clusters_$sim.txt
+  done
+}
+
 count_phylogenies () {
   title "Summing up phylogenies with $count_phyl"
   table_dir=$1
@@ -204,6 +223,12 @@ count_phylogenies () {
       cat $file.paired.out $file.unpaired.out > $file.both.out
      done
   done
+}
+
+concatenate_taxa_and_clusters () {
+  
+  
+  
 }
 
 make_megaclustables () {
