@@ -227,11 +227,11 @@ count_phylogenies () {
 
 concatenate_taxa_and_clusters () {
   
-  title "concatenate taxa and clusters"
+  title "Concatenate taxa with clusters"
   
 }
 
-make_megaclustables () {
+make_cluster_tabless () {
   title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
@@ -254,7 +254,7 @@ megaclustable() {
     $megaclustable \
       -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
       -t $t \
-      -o $out_dir/$out.txt  
+      -o $tables/$out.txt  
 }
 
 run_shannon () {
