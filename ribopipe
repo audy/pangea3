@@ -67,19 +67,19 @@ main () {
   mkdir -p $tables
   mkdir -p $unassembled
   
-#  reference_assemble
+  reference_assemble
   
-#  filter
+  filter
   
-#  separate_unassembled
+  separate_unassembled
   
-#  cluster_unassembled
+  cluster_unassembled
   
-#  make_cluster_tables
+  make_cluster_tables
   
-#  generate_tables
+  generate_tables
   
-#  count_phylogenies $tables
+  count_phylogenies $tables
   
   make_megaclustables $tables $dir
   
