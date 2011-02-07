@@ -299,17 +299,4 @@ status () {
   echo $d $1 >> $logfile
 }
 
-onexit() {
-  red="\033[0;31m"
-  nocolor="\033[0m"
-  c="[$red*$nocolor]" 
-  d="[*]"
-  exit_status=${1:-$?}
-  m="Exiting $0 with $exit_status"
-  echo -e $c $m
-  echo $d $m >> $logfile
-  exit $exit_status
-}
-
-trap onexit 1 2 3 15 ERR
 main
