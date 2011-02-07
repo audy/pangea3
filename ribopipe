@@ -86,8 +86,7 @@ main () {
   run_shannon # on clustered reads!
   
   title "$(date)."
-  
-  onexit
+ 
 }
 
 reference_assemble () { 
