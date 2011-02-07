@@ -1,6 +1,6 @@
 # 16S CLC Reference Assembly and Table Generation Pipeline
 
-Austin G. Davis-Richardson, 
+Austin G. Davis-Richardson,  
 Chris T. Brown,  
 David B. Crabb,  
 
@@ -28,14 +28,10 @@ This will create a `ribopipe/` directory
 Invoke like this:
 
     cd ribopipe/
-    ./ribopipe ../reads/ ../db.fasta
+    ./ribopipe ../reads/ ../db.fasta #shannon "run"
     
 The reason you have to be in the ribopipe directory is because you have to be
 in the same directory as CLC's License file (DRM kills science).
 
-**TIP** - I like to run ribopipe and keep a log of what happened, but I also
-like to see what's happening. So, I do this:
-
-    ./ribopipe ../reads/ ../db.fasta > ../log.txt & tail -f ../log.txt
     
 **TIP2** - The reads filenames are the headers in the megaclustable. So to make it legible, make them short. My preferred format is `L_1_B_002.txt` for Lane 1, barcode 2.
