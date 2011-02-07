@@ -77,13 +77,13 @@ main () {
   
   make_cluster_tables
   
-#  generate_tables
+  generate_tables
   
-#  count_phylogenies $tables
+  count_phylogenies $tables
   
-#  make_megaclustables $tables $dir
+  make_megaclustables $tables $dir
   
-#  run_shannon # on clustered reads!
+  run_shannon # on clustered reads!
   
   title "$(date)."
   
@@ -223,7 +223,7 @@ count_phylogenies () {
   done
 }
 
-make_cluster_tabless () {
+make_cluster_tables () {
   title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
