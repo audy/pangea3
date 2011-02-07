@@ -80,8 +80,6 @@ main () {
 #  generate_tables
   
 #  count_phylogenies $tables
-
-#  concatenate_taxa_and_clusters
   
 #  make_megaclustables $tables $dir
   
@@ -225,34 +223,29 @@ count_phylogenies () {
   done
 }
 
-concatenate_taxa_and_clusters () {
-  
-  title "Concatenate taxa with clusters"
-  
-}
-
 make_cluster_tabless () {
   title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
   
-  megaclustable 99 6 species
-  megaclustable 95 5 genus
-  megaclustable 90 4 family
-  megaclustable 90 3 order
-  megaclustable 90 2 class
-  megaclustable 80 1 phylum
-  megaclustable 80 0 domain
+  megaclustable 99 6 $tables/clusters_99.txt species
+  megaclustable 95 5 $tables/clusters_95.txt genus
+  megaclustable 90 4 $tables/clusters_90.txt family
+  megaclustable 90 3 $tables/clusters_90.txt order
+  megaclustable 90 2 $tables/clusters_80.txt class
+  megaclustable 80 1 $tables/clusters_80.txt phylum
+  megaclustable 80 0 $tables/clusters_80.txt domain
 }
 
 megaclustable() {
     sim=$1
     t=$2
-    out=$3
+    clusters=$3
+    out=$4
     
     status "Megaclustable $out: $sim%, t=$t"
     $megaclustable \
-      -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
+      -m $clusters $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
       -t $t \
       -o $tables/$out.txt  
 }
