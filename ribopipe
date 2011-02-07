@@ -75,11 +75,11 @@ main () {
   
 #  cluster_unassembled
   
-  make_cluster_tables
+#  make_cluster_tables
   
-  generate_tables
+#  generate_tables
   
-  count_phylogenies $tables
+#  count_phylogenies $tables
   
   make_megaclustables $tables $dir
   
@@ -223,7 +223,7 @@ count_phylogenies () {
   done
 }
 
-make_cluster_tables () {
+make_megaclustables () {
   title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
