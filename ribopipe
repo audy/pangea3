@@ -13,12 +13,14 @@ set -o nounset
 
 # ------------------------------ CONFIGURATION ------------------------------
 
-cdhit_overhang="78"
+cdhit_overhang="78" # Minimum CDHIT overlap
+clust_min='12' # Minimum number of reads per cluster
 
 # So you can manually specify which python/perl you want to use.
 python=$(which python)
 perl=$(which perl)
 cores='16'
+
 
 unassembled_reads="src/clc/unassembled_reads"
 
@@ -83,7 +85,7 @@ main () {
   
   make_megaclustables $tables $dir
   
-  run_shannon # on clustered reads!
+  run_shannon
   
   title "$(date)."
  
@@ -203,7 +205,7 @@ make_cluster_tables() {
   do
     file=$unassembled/clustered_$sim.fa.bak.clstr
     status "Counting $file"
-    $count_clusters $file > $tables/clusters_$sim.txt
+    $count_clusters $file $clust_min > $tables/clusters_$sim.txt
   done
 }
 

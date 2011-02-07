@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 from collections import defaultdict
 import sys
-cluster_file = sys.argv[1]
+
+cluster_file, minimum = sys.argv[1], int(sys.argv[2])
 
 counts = defaultdict(int)
 
@@ -11,4 +12,5 @@ with open(cluster_file) as handle:
         counts[int(line[0])] += 1
         
 for count in sorted(counts):
-    print "cluster_%s, %s" % (count, counts[count])
+    if counts[count] >= minimum:
+        print "cluster_%s, %s" % (count, counts[count])
