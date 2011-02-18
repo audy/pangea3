@@ -21,7 +21,6 @@ python=$(which python)
 perl=$(which perl)
 cores='16'
 
-
 unassembled_reads="src/clc/unassembled_reads"
 
 assemble="./src/clc/clc_ref_assemble_long"
@@ -91,7 +90,7 @@ main () {
  
 }
 
-reference_assemble () { 
+reference_assemble () { # Run CLC Reference Assembler
   title "Assembling $reads against $database"
 
   for file in $reads/*.txt
@@ -107,7 +106,7 @@ reference_assemble () {
   done
 }
 
-filter () {
+filter () { # Filteres CLC assembly output based on percent similarity
   title "Filtering with $filter"
   for sim in 80 90 95 99
   do
@@ -123,7 +122,7 @@ filter () {
   done
 }
 
-generate_tables() {
+generate_tables() { # Generates CLC Tables
   title "Generating tables with $make_tables"
   for sim in 80 90 95 99
   do
@@ -141,7 +140,7 @@ generate_tables() {
   done
 }
 
-separate_unassembled() {
+separate_unassembled() { # Separates unassembled reads
   title "Separating/labelling unassembled reads"
   status "Label = $run"
   for sim in 80 90 95 99
@@ -171,7 +170,7 @@ separate_unassembled() {
   done
 }
 
-cluster_unassembled() {
+cluster_unassembled() { # Clusters unassembled reads
   wordsize=10
   
   title "Clustering unassembled reads with $cdhit"
@@ -198,7 +197,7 @@ cluster_unassembled() {
   done
 }
 
-make_cluster_tables() {
+make_cluster_tables() { # Makes tables similar to phylocount from clusters
   title "Building cluster tables"
   
   for sim in 80 90 95 99
@@ -209,7 +208,14 @@ make_cluster_tables() {
   done
 }
 
-count_phylogenies () {
+cat_clusters() { # Add cluster counts to end of phylocount files
+  for sim in 80 90 95 99
+  do
+     
+  done
+}
+
+count_phylogenies () { # Runs phylocount.py
   title "Summing up phylogenies with $count_phyl"
   table_dir=$1
   
@@ -224,34 +230,33 @@ count_phylogenies () {
   done
 }
 
-make_megaclustables () {
+make_megaclustables () { # Makes Megaclust Tables
   title "Megaclustableing with $megaclustable"
   table_dir=$1
   out_dir=$2
   
-  megaclustable 99 6 $tables/clusters_99.txt species
-  megaclustable 95 5 $tables/clusters_95.txt genus
-  megaclustable 90 4 $tables/clusters_90.txt family
-  megaclustable 90 3 $tables/clusters_90.txt order
-  megaclustable 90 2 $tables/clusters_80.txt class
-  megaclustable 80 1 $tables/clusters_80.txt phylum
-  megaclustable 80 0 $tables/clusters_80.txt domain
+  megaclustable 99 6 species
+  megaclustable 95 5 genus
+  megaclustable 90 4 family
+  megaclustable 90 3 order
+  megaclustable 90 2 class
+  megaclustable 80 1 phylum
+  megaclustable 80 0 domain
 }
 
-megaclustable() {
+megaclustable() { # Runs megaclustable.pl
     sim=$1
     t=$2
-    clusters=$3
     out=$4
     
     status "Megaclustable $out: $sim%, t=$t"
     $megaclustable \
-      -m $clusters $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
+      -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
       -t $t \
       -o $tables/$out.txt  
 }
 
-run_shannon () {
+run_shannon () { # The shannon-diversity index
   title "Shannon Diversity Indexing"
 
   mkdir -p $tables/shannon/
