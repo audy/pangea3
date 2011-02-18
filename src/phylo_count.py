@@ -45,7 +45,6 @@ with open(f_db) as handle:
             line[10]
         except:
             print line
-            quit()
         if line[10] is '1': # then it's paired
             paired[int(line[5])] += 1
             try:
@@ -80,8 +79,8 @@ rdp, c = {}, 0
 with open(f_rdp) as handle:
     for line in handle:
         if line.startswith('>'):
-            c += 1
             rdp[c] = line[1:-1]
+            c += 1
 
 merged_counts = defaultdict(int) # getting uglier
 skipped = 0
