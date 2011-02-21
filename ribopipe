@@ -1,7 +1,5 @@
 #!/bin/bash +x
-#set -e # script dies if anything exits in error.
-set -o errtrace
-set -o nounset
+set -e # script dies if anything exits in error.
 # --------------------------------- USAGE -----------------------------------
 
 # ./ribopipe.sh <directory> <database> <shannon-reads>
@@ -14,7 +12,7 @@ set -o nounset
 # ------------------------------ CONFIGURATION ------------------------------
 
 cdhit_overhang="78" # Minimum CDHIT overlap
-clust_min='12' # Minimum number of reads per cluster
+clust_min='10' # Minimum number of reads per cluster
 
 # So you can manually specify which python/perl you want to use.
 python=$(which python)
@@ -68,15 +66,11 @@ main () {
   mkdir -p $tables
   mkdir -p $unassembled
   
-  reference_assemble
+#  reference_assemble
   
-  filter
-  
-  separate_unassembled
-  
+#  filter
+
   cluster_unassembled
-  
-  make_cluster_tables
   
   generate_tables
   
@@ -84,10 +78,20 @@ main () {
   
   make_megaclustables $tables $dir
   
-  run_shannon
+#  run_shannon
   
-  title "$(date)."
+#  title "$(date)."
  
+}
+
+cluster_unassembled () { # Cluster unassembled with cd-hit
+  
+  separate_unassembled
+  
+  cluster
+  
+  make_cluster_tables
+
 }
 
 reference_assemble () { # Run CLC Reference Assembler
@@ -106,7 +110,7 @@ reference_assemble () { # Run CLC Reference Assembler
   done
 }
 
-filter () { # Filteres CLC assembly output based on percent similarity
+filter () { # Filters CLC assembly output based on percent similarity
   title "Filtering with $filter"
   for sim in 80 90 95 99
   do
@@ -122,7 +126,7 @@ filter () { # Filteres CLC assembly output based on percent similarity
   done
 }
 
-generate_tables() { # Generates CLC Tables
+generate_tables () { # Generates CLC Tables
   title "Generating tables with $make_tables"
   for sim in 80 90 95 99
   do
@@ -140,17 +144,20 @@ generate_tables() { # Generates CLC Tables
   done
 }
 
-separate_unassembled() { # Separates unassembled reads
+separate_unassembled () { # Separates unassembled reads
   title "Separating/labelling unassembled reads"
   status "Label = $run"
+
+  rm -rf $unassembled/L_98_S_$sim/$.fa # CLC appends :\
+    
+
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
       status "Separating $(basename $file) @ $sim"
       # Output unassembled reads for each percent similarity
-      rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
-      rm -f $unassembled/unassembled_"$sim".fa # Clean
+
             
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
@@ -170,7 +177,7 @@ separate_unassembled() { # Separates unassembled reads
   done
 }
 
-cluster_unassembled() { # Clusters unassembled reads
+cluster () { # Clusters unassembled reads
   wordsize=10
   
   title "Clustering unassembled reads with $cdhit"
@@ -197,21 +204,14 @@ cluster_unassembled() { # Clusters unassembled reads
   done
 }
 
-make_cluster_tables() { # Makes tables similar to phylocount from clusters
+make_cluster_tables () { # Makes tables similar to phylocount from clusters
   title "Building cluster tables"
   
   for sim in 80 90 95 99
   do
-    file=$unassembled/clustered_$sim.fa.bak.clstr
+    file=$unassembled/clustered_$sim.fa.clstr
     status "Counting $file"
     $count_clusters $file $clust_min > $tables/clusters_$sim.txt
-  done
-}
-
-cat_clusters() { # Add cluster counts to end of phylocount files
-  for sim in 80 90 95 99
-  do
-     
   done
 }
 
@@ -247,7 +247,7 @@ make_megaclustables () { # Makes Megaclust Tables
 megaclustable() { # Runs megaclustable.pl
     sim=$1
     t=$2
-    out=$4
+    out=$3
     
     status "Megaclustable $out: $sim%, t=$t"
     $megaclustable \
