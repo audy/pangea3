@@ -70,17 +70,17 @@ main () {
   
 #  filter
 
-  cluster_unassembled
+#  cluster_unassembled
   
-  generate_tables
+#  generate_tables
   
-  count_phylogenies $tables
+#  count_phylogenies $tables
   
-  make_megaclustables $tables $dir
+#  make_megaclustables $tables $dir
   
-#  run_shannon
+  run_shannon
   
-#  title "$(date)."
+  title "$(date)."
  
 }
 
@@ -288,7 +288,6 @@ run_shannon () { # The shannon-diversity index
   
   
   # Run CD-HIT on unassembled reads
-  
   
   unassembled="$tables/shannon/unassembled"
   
