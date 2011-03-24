@@ -149,8 +149,8 @@ separate_unassembled() { # Separates unassembled reads
     do
       status "Separating $(basename $file) @ $sim"
       # Output unassembled reads for each percent similarity
-      rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
-      rm -f $unassembled/unassembled_"$sim".fa # Clean
+      #rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
+      #rm -f $unassembled/unassembled_"$sim".fa # Clean
             
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
@@ -208,13 +208,6 @@ make_cluster_tables() { # Makes tables similar to phylocount from clusters
   done
 }
 
-cat_clusters() { # Add cluster counts to end of phylocount files
-  for sim in 80 90 95 99
-  do
-     
-  done
-}
-
 count_phylogenies () { # Runs phylocount.py
   title "Summing up phylogenies with $count_phyl"
   table_dir=$1
@@ -232,28 +225,31 @@ count_phylogenies () { # Runs phylocount.py
 
 make_megaclustables () { # Makes Megaclust Tables
   title "Megaclustableing with $megaclustable"
-  table_dir=$1
-  out_dir=$2
-  
-  megaclustable 99 6 species
-  megaclustable 95 5 genus
-  megaclustable 90 4 family
-  megaclustable 90 3 order
-  megaclustable 90 2 class
-  megaclustable 80 1 phylum
-  megaclustable 80 0 domain
+  table_dir=$1 # where they're from
+  out_dir=$2 # where they go, appended to $tables
+
+  megaclustable 99 6 species $out_dir
+  megaclustable 95 5 genus $out_dir
+  megaclustable 90 4 family $out_dir
+  megaclustable 90 3 order $out_dir
+  megaclustable 90 2 class $out_dir
+  megaclustable 80 1 phylum $out_dir
+  megaclustable 80 0 domain $out_dir
 }
+
 
 megaclustable() { # Runs megaclustable.pl
     sim=$1
     t=$2
-    out=$4
-    
+    out=$3
+    out_dir=$4
+
     status "Megaclustable $out: $sim%, t=$t"
+    status "$tables/$out_dir/$out.txt"
     $megaclustable \
       -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
       -t $t \
-      -o $tables/$out.txt  
+      -o $tables/$out_dir/$out.txt
 }
 
 run_shannon () { # The shannon-diversity index
@@ -274,12 +270,24 @@ run_shannon () { # The shannon-diversity index
   done
   
   # Run Phylocount
-  count_phylogenies "$tables/shannon"    
+  count_phylogenies "$tables/shannon"
+  
+  # Separate unassembled from smaller-tables
+  
+  exit
+  
+  
+  # Run CD-HIT on unassembled reads
+  
+  
+  unassembled="$tables/shannon/unassembled"
   
   # Run Megaclustable
-  make_megaclustables "$tables/shannon" "$tables/shannon/"
+  make_megaclustables "$tables/shannon" "shannon/"
   
-  # Run shannon.pl on our standardized tables
+  # Create hybrid-tables
+  
+  # Run shannon.pl on hybrid-tables tables
   for filename in $tables/shannon/*.txt
   do
     $shannon -t $filename >> $filename
