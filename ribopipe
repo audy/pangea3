@@ -20,6 +20,7 @@ perl=$(which perl)
 cores='16'
 
 unassembled_reads="src/clc/unassembled_reads"
+get_unassembled_py="python src/get_unassembled.py"
 
 assemble="./src/clc/clc_ref_assemble_long"
 filter="./src/clc/filter_matches"
@@ -70,6 +71,8 @@ main () {
   
 #  filter
 
+  separate_unassembled
+
 #  cluster_unassembled
   
 #  generate_tables
@@ -78,7 +81,7 @@ main () {
   
 #  make_megaclustables $tables $dir
   
-  run_shannon
+#  run_shannon
   
   title "$(date)."
  
@@ -272,10 +275,16 @@ run_shannon () { # The shannon-diversity index
     # Make files
     for file in $tables/L_98_S_$sim/*.table
     do
+      # Make mini CLC Table
       $pre_shannon \
         $shannon_reads \
         $file \
         $tables/shannon/L_98_S_$sim/$(basename $file)
+
+      # Get unassembled reads using mini CLC Table
+      $get_unassembled_py \
+        $tables/shannon/L_98_S_$sim/$(basename $file)
+      
     done    
   done
   

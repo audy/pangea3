@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# outputs a FASTQ file but with its filename in the header (sorta)
+# outputs a FASTA file but with its filename in the header (sorta)
 # Also puts paired reads together with their 5' ends touching
 # This is for clustering
 # Takes input from STDIN
