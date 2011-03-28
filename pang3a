@@ -1,0 +1,42 @@
+#!/bin/bash +x
+
+. lib/libpang3a   # Load pang3a
+. config          # Load configuration
+
+set -e # script dies if anything exits in error.
+# --------------------------------- USAGE -----------------------------------
+
+# ./pang3a <directory> <database> <shannon-reads>
+
+#                            .----.       
+#                            `--  ;       
+#   .---.  .--.  ,-.,-. .--.  .' '  .--.  
+#   : .; `' .; ; : ,. :' .; : _`,`.' .; ; 
+#   : ._.'`.__,_;:_;:_;`._. ;`.__.'`.__,_;
+#   : :                 .-. :             
+#   :_;                 `._.'
+
+
+pang3a () {
+  initialize!
+  
+#  reference_assemble  
+
+#  filter
+
+#  separate_unassembled
+
+#  cluster_unassembled
+  
+#  generate_tables
+  
+#  count_phylogenies $tables
+  
+#  make_megaclustables $tables $dir
+  
+  run_shannon
+  
+  title "$(date)."
+}
+
+pang3a

@@ -1,0 +1,42 @@
+#!/bin/bash
+# ------------------------------ CONFIGURATION ------------------------------
+
+cdhit_overhang="78" # Minimum CDHIT overlap
+clust_min='10' # Minimum number of reads per cluster
+
+# So you can manually specify which python/perl you want to use.
+python=$(which python)
+perl=$(which perl)
+cores='16'
+
+unassembled_reads="src/clc/unassembled_reads"
+get_unassembled_py="python src/get_unassembled.py"
+
+assemble="./src/clc/clc_ref_assemble_long"
+filter="./src/clc/filter_matches"
+make_tables="./src/clc/assembly_table"
+cdhit="src/cdhit/cd-hit-est"
+
+count_phyl="$python src/phylo_count.py"
+megaclustable="$perl src/megaclustable.pl"
+pre_shannon="$python src/preshannon.py"
+shannon="$perl src/shannon.pl"
+count_clusters="$python src/count_clusters.py"
+label_fasta="$python src/label_fasta.py"
+
+# To get number of cores automatically, uncomment:
+#cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
+
+# ---------------------------------------------------------------------------
+
+dir=$1 # working directory
+reads=$1/reads # where the reads are at
+clc_out=$1/clc_out # where CLC's output goes
+tables=$1/tables # where the tables go
+database=$2 # the RDP database
+shannon_reads=$3 # number of reads for Shannon-Diversity Index
+run=$4 # This gets added to the headers of the unmatched reads (ugly patch)
+unassembled=$1/reads/unassembled # Where unassembled reads are kept
+logfile=$dir/log.txt
+
+# ---------------------------------------------------------------------------

@@ -1,57 +1,9 @@
-#!/bin/bash +x
-set -e # script dies if anything exits in error.
-# --------------------------------- USAGE -----------------------------------
+#!/bin/bash
 
-# ./ribopipe.sh <directory> <database> <shannon-reads>
+# Tons of hacky obfuscated methods used by ribopipe!
 
-# - Directory contains reads
-# - Database is a TaxCollector database in FASTA format
-# - Shannon-reads is the number of reads to use to calculate the
-#     Shannon Diversity Index
 
-# ------------------------------ CONFIGURATION ------------------------------
-
-cdhit_overhang="78" # Minimum CDHIT overlap
-clust_min='10' # Minimum number of reads per cluster
-
-# So you can manually specify which python/perl you want to use.
-python=$(which python)
-perl=$(which perl)
-cores='16'
-
-unassembled_reads="src/clc/unassembled_reads"
-get_unassembled_py="python src/get_unassembled.py"
-
-assemble="./src/clc/clc_ref_assemble_long"
-filter="./src/clc/filter_matches"
-make_tables="./src/clc/assembly_table"
-cdhit="src/cdhit/cd-hit-est"
-
-count_phyl="$python src/phylo_count.py"
-megaclustable="$perl src/megaclustable.pl"
-pre_shannon="$python src/preshannon.py"
-shannon="$perl src/shannon.pl"
-count_clusters="$python src/count_clusters.py"
-label_fasta="$python src/label_fasta.py"
-
-# To get number of cores automatically, uncomment:
-#cores=`system_profiler|head -n 10|grep Total\ Number\ Of\ Cores | cut -d ':' -f 2`
-
-# ---------------------------------------------------------------------------
-
-dir=$1 # working directory
-reads=$1/reads # where the reads are at
-clc_out=$1/clc_out # where CLC's output goes
-tables=$1/tables # where the tables go
-database=$2 # the RDP database
-shannon_reads=$3 # number of reads for Shannon-Diversity Index
-run=$4 # This gets added to the headers of the unmatched reads (ugly patch)
-unassembled=$1/reads/unassembled # Where unassembled reads are kept
-logfile=$dir/log.txt
-
-# ---------------------------------------------------------------------------
-
-main () {
+initialize! () {
   title "$(date)"
   status "DIR = $dir"
   status "READS = $reads"
@@ -66,25 +18,6 @@ main () {
   mkdir -p $clc_out
   mkdir -p $tables
   mkdir -p $unassembled
-  
-#  reference_assemble
-  
-#  filter
-
-  separate_unassembled
-
-#  cluster_unassembled
-  
-#  generate_tables
-  
-#  count_phylogenies $tables
-  
-#  make_megaclustables $tables $dir
-  
-#  run_shannon
-  
-  title "$(date)."
- 
 }
 
 cluster_unassembled () { # Cluster unassembled with cd-hit
@@ -184,16 +117,17 @@ separate_unassembled () { # Separates unassembled reads
 }
 
 cluster () { # Clusters unassembled reads
+  directory=$1
   wordsize=10
   
-  title "Clustering unassembled reads with $cdhit"
+  title "Clustering reads in $directory with $cdhit"
   status "Overhang = $cdhit_overhang"
   status "Wordsize = $wordsize"
   
   for sim in 80 90 95 99
   do
-    input=$unassembled/unassembled_$sim.fa
-    output=$unassembled/clustered_$sim.fa
+    input=$directory/unassembled_$sim.fa
+    output=$directory/clustered_$sim.fa
     
     $cdhit \
       -i $input \
@@ -205,7 +139,7 @@ cluster () { # Clusters unassembled reads
       -g 1 \
       > /dev/null
       
-    thismany=`grep -c '^>' $unassembled/clustered_$sim.fa`
+    thismany=`grep -c '^>' $directory/clustered_$sim.fa`
     status "$sim% => $thismany clusters"
   done
 }
@@ -269,46 +203,111 @@ run_shannon () { # The shannon-diversity index
   title "Shannon Diversity Indexing"
 
   mkdir -p $tables/shannon/
-  for sim in 80 90 95 99
-  do
-    mkdir -p $tables/shannon/L_98_S_$sim
-    # Make files
-    for file in $tables/L_98_S_$sim/*.table
+  
+  make_shannon_tables () {
+    # Make Shannon Tables!
+    for sim in 80 90 95 99
     do
-      # Make mini CLC Table
-      $pre_shannon \
-        $shannon_reads \
-        $file \
-        $tables/shannon/L_98_S_$sim/$(basename $file)
-
-      # Get unassembled reads using mini CLC Table
-      $get_unassembled_py \
-        $tables/shannon/L_98_S_$sim/$(basename $file)
-      
-    done    
-  done
+      mkdir -p $tables/shannon/L_98_S_$sim
+      for file in $tables/L_98_S_$sim/*.table
+      do
+        $pre_shannon \
+          $shannon_reads \
+          $file \
+          $tables/shannon/L_98_S_$sim/$(basename $file)
+      done
+    done
+  }
+  #make_shannon_tables
+  
+  separate_unassambled_shannon () {
+    # Separate Unassembled reads using Shannon Tables!
+    mkdir -p $tables/shannon/unassembled
+    for file in $reads/*.txt
+    do
+      for sim in 80 90 95 99
+      do
+        echo $file, $sim
+        mkdir -p $tables/shannon/unassembled/L_98_S_$sim
+        dir="$tables/shannon/L_98_S_$sim"
+        $get_unassembled_py \
+          $dir/$(basename $file).out.filtered.table \
+          $file |
+        $label_fasta \
+          $file > $tables/shannon/unassembled/L_98_S_$sim/$(basename $file)
+      done
+    done
+  }
+  #separate_unassambled_shannon
   
   # Run Phylocount
-  count_phylogenies "$tables/shannon"
+  #count_phylogenies "$tables/shannon"
+    
+  # concatenate unassembled reads
+  cluster () {
+    for sim in 99
+    do
+      rm -f $tables/shannon/unassembled/unassembled_$sim.txt
+      status "Concatenating unassembled @ $sim"
+      for file in $tables/shannon/unassembled/L_98_S_$sim/*
+      do
+        cat $file >> $tables/shannon/unassembled/unassembled_$sim.txt
+      done
+      mkdir -p $tables/shannon/unassembled/clusters
+      # Run CD-HIT on unassembled reads
+      status "running CDHIT: $tables/shannon/unassembled/unassembled_$sim.txt"
+      $cdhit \
+        -i $tables/shannon/unassembled/unassembled_$sim.txt \
+        -o $tables/shannon/unassembled/clusters/clusters_$sim.txt \
+        -c 0.$sim \
+        -n 10 \
+        -T 16 \
+        -M 0 \
+        > /dev/null 
+    done
+  }
+
+  cluster
   
-  # Separate unassembled from smaller-tables
-  
-  exit
-  
-  
-  # Run CD-HIT on unassembled reads
-  
-  unassembled="$tables/shannon/unassembled"
-  
-  # Run Megaclustable
-  make_megaclustables "$tables/shannon" "shannon/"
-  
-  # Create hybrid-tables
+
+  # Create hybrid-tables  
+  hybrid_table () {
+    CUTOFF=1
+    # Run Megaclustable-like script    
+    for sim in 80 90 95 99
+    do
+      python src/count_clusters.py \
+        $tables/shannon/unassembled/clusters/clusters_$sim.txt.clstr \
+        $CUTOFF \
+        > $tables/shannon/unassembled/clusters/cluster_table_$sim.txt
+        
+    done
+    
+    mkdir -p $tables/hybrid_tables/
+
+    ht () {
+      sim=$1
+      name=$2
+      python src/hybrid_table.py \
+        $tables/shannon/unassembled/clusters/cluster_table_$sim.txt \
+        $tables/$name.txt > $tables/hybrid_tables/$name.txt
+    }
+      
+    # Z.O.M.G!! DSL
+    ht 99 species
+    ht 95 genus
+    ht 90 family
+    ht 90 order
+    ht 90 class
+    ht 80 phylum
+    ht 80 domain 
+  }
+  hybrid_table 
   
   # Run shannon.pl on hybrid-tables tables
-  for filename in $tables/shannon/*.txt
+  for file in $tables/hybrid_tables/*.txt
   do
-    $shannon -t $filename >> $filename
+    $shannon -t $file >> $file
   done
 }
 
@@ -329,5 +328,3 @@ status () {
   echo -e $c $1
   echo $d $1 >> $logfile
 }
-
-main

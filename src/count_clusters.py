@@ -13,42 +13,40 @@ with open(clust_file) as handle:
     for line in handle:
         if line.startswith('>'):
             cluster = int(line[1:-1].split()[1])
-
         else:
             header = line.split()[2].lstrip('>').rstrip('.')
-            barcode, read = header.split(':')
-            barcode = int(barcode)
+            lane_barcode, read = header.split(':')
+            lane_barcode = "%s.%s" % (lane_barcode.split('.')[1], lane_barcode.split('.')[0])
             if cluster in counts:
-                if barcode in counts[cluster]:
-                    counts[cluster][barcode] += 1
+                if lane_barcode in counts[cluster]:
+                    counts[cluster][lane_barcode] += 1
                 else:
-                    counts[cluster][barcode] = 1
+                    counts[cluster][lane_barcode] = 1
             else:
                 counts[cluster] = {}
-                counts[cluster][barcode] = 1
+                counts[cluster][lane_barcode] = 1
 
 # Print table headers
 
 barcodes = sorted(max(counts.values(), key=len).keys())
 
-def print_headers():
-    
-    print "-\t",
-    for barcode in barcodes:
-        print "%s\t" % barcode,
-    print ''
-    
-print_headers
+print "-\t",
+for lane_barcode in barcodes:
+    lb = [int(i) for i in lane_barcode.split('.')]
+    print "L_%s_B_%.3i\t" % (lb[0], lb[1]),
+print ''
 
+    
 # Print table values
 
 for cluster in counts:
-    if sum(counts[cluster]) < cutoff:
-        continued
+
+    if sum(counts[cluster].values()) < cutoff:
+        continue
     print "%s\t" % cluster,
-    for barcode in barcodes:
+    for lane_barcode in barcodes:
         try:
-            val = counts[cluster][barcode]
+            val = counts[cluster][lane_barcode]
         except KeyError:
             val = '0'
         print "%s\t" % val,

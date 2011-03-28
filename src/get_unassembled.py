@@ -25,7 +25,7 @@ with open(table) as handle:
 # Print unassembled reads in FASTA format!
 # Also, we need to fix the headers        
 
-# Print output in FASTQ format
+# Print output in FASTA format!
 
 with open(reads) as handle:
     keep = False
@@ -35,6 +35,6 @@ with open(reads) as handle:
             keep = False
             if line[1:-1] in unassembled:
                 keep = True
-                print line.strip()
-        elif keep:
+                print ">%s" % line[1:-1]
+        elif keep and (n == 2):
             print line.strip()

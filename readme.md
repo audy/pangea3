@@ -1,4 +1,4 @@
-# 16S CLC Reference Assembly and Table Generation Pipeline
+# Pang3a
 
 Austin G. Davis-Richardson,  
 Chris T. Brown,  
@@ -19,18 +19,18 @@ Your directory structure should look like this:
     /reads/
     /database/
 
-Then download ribopipe:
+Then download pang3a:
 
-    $ git clone git@github.com:audy/ribopipe.git
+    $ git clone git@github.com:audy/pang3a.git
     
-This will create a `ribopipe/` directory
+This will create a `pang3a/` directory
     
 Invoke like this:
 
-    cd ribopipe/
-    ./ribopipe ../reads/ ../db.fasta #shannon "run"
+    cd pang3a/
+    ./pang3a ../reads/ ../db.fasta #shannon "run"
     
-The reason you have to be in the ribopipe directory is because you have to be
+The reason you have to be in the pang3a directory is because you have to be
 in the same directory as CLC's License file (DRM kills science).
 
     
