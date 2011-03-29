@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # Tons of hacky obfuscated methods used by ribopipe!
-
-
 initialize! () {
   title "$(date)"
   status "DIR = $dir"
@@ -85,8 +83,7 @@ separate_unassembled () { # Separates unassembled reads
   status "Label = $run"
 
   rm -rf $unassembled/L_98_S_$sim/$.fa # CLC appends :\
-    
-
+  
   for sim in 80 90 95 99
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
@@ -267,15 +264,16 @@ run_shannon () { # The shannon-diversity index
     done
   }
 
-  cluster
+#  cluster
   
 
   # Create hybrid-tables  
   hybrid_table () {
     CUTOFF=1
     # Run Megaclustable-like script    
-    for sim in 80 90 95 99
+    for sim in 80 90 95
     do
+      status "count clusters, $sim"
       python src/count_clusters.py \
         $tables/shannon/unassembled/clusters/clusters_$sim.txt.clstr \
         $CUTOFF \
@@ -286,15 +284,17 @@ run_shannon () { # The shannon-diversity index
     mkdir -p $tables/hybrid_tables/
 
     ht () {
+      status "hybrid table $1 $2"
       sim=$1
       name=$2
       python src/hybrid_table.py \
         $tables/shannon/unassembled/clusters/cluster_table_$sim.txt \
         $tables/$name.txt > $tables/hybrid_tables/$name.txt
+        echo $tables/hybrid_tables/$name.txt
     }
       
     # Z.O.M.G!! DSL
-    ht 99 species
+#    ht 99 species
     ht 95 genus
     ht 90 family
     ht 90 order

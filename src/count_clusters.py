@@ -30,7 +30,7 @@ with open(clust_file) as handle:
 
 barcodes = sorted(max(counts.values(), key=len).keys())
 
-print "-\t",
+print "\t",
 for lane_barcode in barcodes:
     lb = [int(i) for i in lane_barcode.split('.')]
     print "L_%s_B_%.3i\t" % (lb[0], lb[1]),
