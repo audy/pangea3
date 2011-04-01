@@ -20,9 +20,11 @@ i = 0
 
 infile = sys.argv[1]
 
+
 barcode = int(infile.split('_')[-1].split('.')[0])
-lane = int(infile.split('_')[1]
-)
+
+lane = int(infile.split('_')[-3])
+
 for line in sys.stdin:
     if line.startswith('>'):
         n = c.next()

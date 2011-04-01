@@ -94,13 +94,14 @@ separate_unassembled () { # Separates unassembled reads
       #rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
       #rm -f $unassembled/unassembled_"$sim".fa # Clean
 
-            
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \
          -p \
          -a $file \
          -o /dev/stdout | \
 
+
+      tee  $unassembled/unassembled_"$sim".fa | \
          # Concatenate unassembled reads while adding ids to header
          # Reads have to go together a certain way to be clustered
          # 5'-read1-3' + 3'-read2-5'
@@ -108,7 +109,7 @@ separate_unassembled () { # Separates unassembled reads
          $label_fasta \
            $unassembled/L_98_S_$sim/$(basename $file).fa \
            $run \
-           >> $unassembled/unassembled_"$sim".fa
+           >> $unassembled/join_unassembled_"$sim".fa
     done
   done
 }
