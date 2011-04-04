@@ -101,7 +101,7 @@ separate_unassembled () { # Separates unassembled reads
          -o /dev/stdout | \
 
 
-      tee  $unassembled/unassembled_"$sim".fa | \
+      tee $unassembled/L_98_S_$sim/$(basename $file) | \
          # Concatenate unassembled reads while adding ids to header
          # Reads have to go together a certain way to be clustered
          # 5'-read1-3' + 3'-read2-5'
@@ -216,7 +216,7 @@ run_shannon () { # The shannon-diversity index
       done
     done
   }
-  #make_shannon_tables
+  make_shannon_tables
   
   separate_unassambled_shannon () {
     # Separate Unassembled reads using Shannon Tables!
@@ -236,10 +236,10 @@ run_shannon () { # The shannon-diversity index
       done
     done
   }
-  #separate_unassambled_shannon
+  separate_unassambled_shannon
   
   # Run Phylocount
-  #count_phylogenies "$tables/shannon"
+  count_phylogenies "$tables/shannon"
     
   # concatenate unassembled reads
   cluster () {
@@ -265,7 +265,7 @@ run_shannon () { # The shannon-diversity index
     done
   }
 
-#  cluster
+  cluster
   
 
   # Create hybrid-tables  
@@ -295,7 +295,7 @@ run_shannon () { # The shannon-diversity index
     }
       
     # Z.O.M.G!! DSL
-#    ht 99 species
+    ht 99 species
     ht 95 genus
     ht 90 family
     ht 90 order
