@@ -173,13 +173,13 @@ make_megaclustables () { # Makes Megaclust Tables
   table_dir=$1 # where they're from
   out_dir=$2 # where they go, appended to $tables
 
-  megaclustable 99 6 species $out_dir
-  megaclustable 95 5 genus $out_dir
-  megaclustable 90 4 family $out_dir
-  megaclustable 90 3 order $out_dir
-  megaclustable 90 2 class $out_dir
-  megaclustable 80 1 phylum $out_dir
-  megaclustable 80 0 domain $out_dir
+  megaclustable 99 6 species $table_dir $out_dir
+  megaclustable 95 5 genus $table_dir $out_dir
+  megaclustable 90 4 family $table_dir $out_dir
+  megaclustable 90 3 order $table_dir $out_dir
+  megaclustable 90 2 class $table_dir $out_dir
+  megaclustable 80 1 phylum $table_dir $out_dir
+  megaclustable 80 0 domain $table_dir $out_dir
 }
 
 
@@ -300,8 +300,7 @@ run_shannon () { # The shannon-diversity index
   #separate_unassambled_shannon
   #count_phylogenies "$tables/shannon"
   
-  $table_dir = "$tables/shannon"
-  make_megaclustables "$tables/shannon"
+  make_megaclustables "$tables/shannon" $table_dir
   
   #cluster
   #hybrid_table
