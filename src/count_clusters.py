@@ -16,6 +16,7 @@ with open(clust_file) as handle:
         else:
             header = line.split()[2].lstrip('>').rstrip('.')
             lane_barcode, read = header.split(':')
+            lane_barcode = "%s.%s" % (lane_barcode.split('.')[1], lane_barcode.split('.')[0])
             if cluster in counts:
                 if lane_barcode in counts[cluster]:
                     counts[cluster][lane_barcode] += 1
@@ -31,17 +32,15 @@ barcodes = sorted(max(counts.values(), key=len).keys())
 
 print "\t",
 for lane_barcode in barcodes:
-    l = lane_barcode.split('.')
-    run, b, n = l
-    b = int(b)
-    n = int(n)
-    print "%s_L_%s_B_%.3i\t" % (run, n, b),
+    lb = [int(i) for i in lane_barcode.split('.')]
+    print "L_%s_B_%.3i\t" % (lb[0], lb[1]),
 print ''
 
     
 # Print table values
 
 for cluster in counts:
+
     if sum(counts[cluster].values()) < cutoff:
         continue
     print "%s\t" % cluster,

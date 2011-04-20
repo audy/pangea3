@@ -20,19 +20,17 @@ i = 0
 
 infile = sys.argv[1]
 
-filename = os.path.basename(infile)
-exp = filename.split('_')[i]
-barcode = int(  filename.split('_')[-1].split('.')[0] )
-lane = int(filename.split('_')[-3])
 
-print >> sys.stderr, infile, exp, barcode, lane
+barcode = int(infile.split('_')[-1].split('.')[0])
+
+lane = int(infile.split('_')[-3])
 
 for line in sys.stdin:
     if line.startswith('>'):
         n = c.next()
         i += 1
         if n == 1:
-            print '>%s.%s.%s:%s' % (exp, barcode, lane, hex(i)[2:])
+            print '>%s.%s:%s' % (barcode, lane, hex(i)[2:])
     else:
         seq[n] += line.strip()
         if n == 1:

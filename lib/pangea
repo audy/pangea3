@@ -207,15 +207,17 @@ run_shannon () { # The shannon-diversity index
     for sim in 80 90 95 99
     do
       mkdir -p $tables/shannon/L_98_S_$sim
-        parallel \
-        "$pre_shannon \
+      for file in $tables/L_98_S_$sim/*.table
+      do
+        $pre_shannon \
           $shannon_reads \
-          {} \
-          $tables/shannon/L_98_S_$sim/{/}" ::: $tables/L_98_S_$sim/*.table 
+          $file \
+          $tables/shannon/L_98_S_$sim/$(basename $file)
+      done
     done
-    exit
   }
- 
+  make_shannon_tables
+  
   separate_unassambled_shannon () {
     # Separate Unassembled reads using Shannon Tables!
     mkdir -p $tables/shannon/unassembled
@@ -234,12 +236,16 @@ run_shannon () { # The shannon-diversity index
       done
     done
   }
+  separate_unassambled_shannon
   
+  # Run Phylocount
+  count_phylogenies "$tables/shannon"
+    
+  # concatenate unassembled reads
   cluster () {
-    for sim in 80 90 95 99
+    for sim in 99
     do
       rm -f $tables/shannon/unassembled/unassembled_$sim.txt
-      # concatenate unassembled reads!
       status "Concatenating unassembled @ $sim"
       for file in $tables/shannon/unassembled/L_98_S_$sim/*
       do
@@ -258,11 +264,15 @@ run_shannon () { # The shannon-diversity index
         > /dev/null 
     done
   }
-    # Create hybrid-tables  
+
+  cluster
+  
+
+  # Create hybrid-tables  
   hybrid_table () {
     CUTOFF=1
     # Run Megaclustable-like script    
-    for sim in 80 90 95 99
+    for sim in 80 90 95
     do
       status "count clusters, $sim"
       python src/count_clusters.py \
@@ -283,8 +293,8 @@ run_shannon () { # The shannon-diversity index
         $tables/$name.txt > $tables/hybrid_tables/$name.txt
         echo $tables/hybrid_tables/$name.txt
     }
-    
-    # Make Hybrid Tables
+      
+    # Z.O.M.G!! DSL
     ht 99 species
     ht 95 genus
     ht 90 family
@@ -293,21 +303,7 @@ run_shannon () { # The shannon-diversity index
     ht 80 phylum
     ht 80 domain 
   }
-  
-  # SHANNON DIVERSITY INDEXING:
-
-  tabledir="$tables/shannon"
-  #hybrid_table 
-  
-  #make_shannon_tables
-  
-  #separate_unassambled_shannon
-  
-  count_phylogenies "$tables/shannon"
-  
-  #cluster
-  
-  #make_megaclustables "$tables/shannon"
+  hybrid_table 
   
   # Run shannon.pl on hybrid-tables tables
   for file in $tables/hybrid_tables/*.txt
