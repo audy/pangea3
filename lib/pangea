@@ -300,7 +300,7 @@ run_shannon () { # The shannon-diversity index
   #separate_unassambled_shannon
   #count_phylogenies "$tables/shannon"
   
-  make_megaclustables "$tables/shannon" $table_dir
+  make_megaclustables "$tables/shannon" "shannon"
   
   #cluster
   #hybrid_table
