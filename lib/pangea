@@ -216,7 +216,7 @@ run_shannon () { # The shannon-diversity index
       done
     done
   }
-  make_shannon_tables
+  
   
   separate_unassambled_shannon () {
     # Separate Unassembled reads using Shannon Tables!
@@ -236,11 +236,7 @@ run_shannon () { # The shannon-diversity index
       done
     done
   }
-  separate_unassambled_shannon
-  
-  # Run Phylocount
-  count_phylogenies "$tables/shannon"
-    
+
   # concatenate unassembled reads
   cluster () {
     for sim in 99
@@ -264,9 +260,6 @@ run_shannon () { # The shannon-diversity index
         > /dev/null 
     done
   }
-
-  cluster
-  
 
   # Create hybrid-tables  
   hybrid_table () {
@@ -303,7 +296,12 @@ run_shannon () { # The shannon-diversity index
     ht 80 phylum
     ht 80 domain 
   }
-  hybrid_table 
+  
+  #make_shannon_tables
+  #separate_unassambled_shannon
+  count_phylogenies "$tables/shannon"
+  #cluster
+  hybrid_table
   
   # Run shannon.pl on hybrid-tables tables
   for file in $tables/hybrid_tables/*.txt
