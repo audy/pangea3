@@ -42,20 +42,19 @@ with open(file_clc) as handle:
         except StopIteration:
             continue
                 
-
 del fasta
 
-# Iterate through fasta file printing only reads that are to be kept.
+# Iteate through fastq file printing only reads that are to be kept.
 with open(file_fas) as handle:
     n = cycle([0, 1, 2, 3])
-    switch = cycle([0, 1])
+    switch = cycle(['0', '1'])
     for line in handle:
         i = n.next()
         if i is 0:
             c = switch.next()
             keep = False
             header = line[1:-1]
-            if (header in keepers) and (str(c) in pair):
+            if (header in keepers) and (c in pair):
                 print ">%s" % keepers[header]
                 keep = True
         if (i is 1) and keep:

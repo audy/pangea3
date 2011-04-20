@@ -18,7 +18,7 @@ pang3a () {
 
 #  filter
 
-  separate_unassembled
+#  separate_unassembled
 
 #  cluster_unassembled
 
@@ -28,7 +28,7 @@ pang3a () {
 
 #  make_megaclustables $tables $dir
 
-#  run_shannon
+  run_shannon
   
   title "$(date)."
 }

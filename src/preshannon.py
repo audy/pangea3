@@ -8,6 +8,7 @@ DESCRIPTION = """"Generates files for calculating Shannon Diversity Index.
 import sys
 import glob
 import os
+from random import choice
 
 usage = '%s <reads> <filename>'
 
@@ -21,19 +22,20 @@ except IndexError, ValueError:
 
 # Grab those reads from CLC table, make new tables.
 
-c = 0
-out = open(outfile, 'w')
-with open(filename) as handle:
-    for line in handle: # 1 line = 1 read.
-        c += 1 # start counting at 1
-        if c >= reads:
-            break # start a new one.
-        else:
-            print >> out, line.strip()
+lines = [ line.strip() for line in open(filename) ]
 
-if (c < reads):
-    print >> sys.stderr, "%s < %s (%s) [deleting]" % (c/2, reads/2, filename)
-    out.close()
-    os.unlink(outfile)
-else:
-    out.close()
+if len(lines) < reads:
+    print >> sys.stderr, "skipping %s" % filename
+    quit()    
+
+
+with open(outfile, 'w') as out:
+    keeps = []
+    for i in range(0, reads):
+        keeper = choice(lines)
+        keeps.append(keeper)
+        lines.remove(keeper)
+
+    for line in keeps:
+        print >> out, line.strip()
+

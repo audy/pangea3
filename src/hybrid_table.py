@@ -13,7 +13,7 @@ for filename in [first, second]:
     print >> sys.stderr, first, second
     with open(filename) as handle:
         headers = handle.next().strip().split('\t')
-        print >> sys.stderr, headers
+#        print >> sys.stderr, headers
 
         [ all_headers.add(i) for i in headers ]
             
