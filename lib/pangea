@@ -190,11 +190,14 @@ megaclustable() { # Runs megaclustable.pl
     out_dir=$4
 
     status "Megaclustable $out: $sim%, t=$t"
+    status "tables = $tables"
+    status "outdir = $out_dir"
+    status "out = $out"
     status "$tables/$out_dir/$out.txt"
     $megaclustable \
       -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
       -t $t \
-      -o $tables/$out_dir/$out.txt
+      -o $out_dir/$out.txt
 }
 
 run_shannon () { # The shannon-diversity index
@@ -249,6 +252,7 @@ run_shannon () { # The shannon-diversity index
       mkdir -p $tables/shannon/unassembled/clusters
       # Run CD-HIT on unassembled reads
       status "running CDHIT: $tables/shannon/unassembled/unassembled_$sim.txt"
+      
       $cdhit \
         -i $tables/shannon/unassembled/unassembled_$sim.txt \
         -o $tables/shannon/unassembled/clusters/clusters_$sim.txt \
@@ -282,7 +286,7 @@ run_shannon () { # The shannon-diversity index
       name=$2
       python src/hybrid_table.py \
         $tables/shannon/unassembled/clusters/cluster_table_$sim.txt \
-        $tables/$name.txt > $tables/hybrid_tables/$name.txt
+        $tables/shannon/$name.txt > $tables/hybrid_tables/$name.txt
         echo $tables/hybrid_tables/$name.txt
     }
       
@@ -296,14 +300,14 @@ run_shannon () { # The shannon-diversity index
     ht 80 domain 
   }
   
-  #make_shannon_tables
-  #separate_unassambled_shannon
-  #count_phylogenies "$tables/shannon"
-  
+  make_shannon_tables
+  separate_unassambled_shannon
+  count_phylogenies "$tables/shannon"
+ 
   make_megaclustables "$tables/shannon" "shannon"
   
-  #cluster
-  #hybrid_table
+  cluster
+  hybrid_table
   
   # Run shannon.pl on hybrid-tables tables
   for file in $tables/hybrid_tables/*.txt
