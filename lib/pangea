@@ -18,6 +18,31 @@ initialize! () {
   mkdir -p $unassembled
 }
 
+trim() {
+
+  title "trimming/converting to FASTQ with $trim"
+ 
+  # I better get an award for this:
+
+  for file in $raw_reads/*_1.txt
+  do
+    args=$(python<<EOF
+filename = "$(basename $file)"
+ext = "$(basename $file)".split('.')[1]
+filename = filename.split('_')
+run = filename[0]
+lane = filename[2]
+barcode = filename[4]
+s = "%s_L_%s_B_%s_%s"
+print "-a $(dirname $file)/%s.%s -b $(dirname $file)/%s.%s" % (s % (run, lane, barcode, 1), ext, s % (run, lane, barcode, 3), ext)
+EOF)
+
+mkdir -p $reads
+$trim $args > $reads/$(basename $file)
+done
+
+}
+
 cluster_unassembled () { # Cluster unassembled with cd-hit
   
   separate_unassembled

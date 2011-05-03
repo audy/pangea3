@@ -9,6 +9,8 @@ python=$(which python)
 perl=$(which perl)
 cores='16'
 
+trim="$perl src/trim2_illumina.pl"
+
 unassembled_reads="src/clc/unassembled_reads"
 get_unassembled_py="python src/get_unassembled.py"
 
@@ -30,7 +32,8 @@ label_fasta="$python src/label_fasta.py"
 # ---------------------------------------------------------------------------
 
 dir=$1 # working directory
-reads=$1/reads # where the reads are at
+raw_reads=$1/raw_reads # where the raw, untrimmed reads are (QSEQ format)
+reads=$1/reads # where the reads are at (trimmed, FASTQ format)
 clc_out=$1/clc_out # where CLC's output goes
 tables=$1/tables # where the tables go
 database=$2 # the RDP database
