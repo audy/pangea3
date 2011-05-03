@@ -12,27 +12,26 @@ source './config'
 
 
 pang3a () {
-  initialize!
+#  initialize!
 
-  trim
+#  trim
 
-  exit
+#  reference_assemble
 
-  reference_assemble
+#  filter
 
-  filter
-
-  separate_unassembled
+#  separate_unassembled
 
   cluster_unassembled
 
+  exit
   generate_tables  
 
   count_phylogenies $tables
 
   make_megaclustables $tables $dir
 
-  run_shannon
+  #run_shannon
   
   title "$(date)."
 }

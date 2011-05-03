@@ -24,6 +24,7 @@ $TRUNCATE = 11;
 # Number thrown out
 
 use Getopt::Std;
+use File::Basename;
 
 # PARSE ARGUMENTS
 my %parameters;
@@ -49,11 +50,14 @@ unless ( open( READ2, "$read2" ) ) {
     exit;
 }
 
-@split_out1 = split( /\./, $read1 );
-@split_out2 = split( /\./, $read2 );
+@split_out1 = split( /\./, $prefix );
 
-open SINGLE1, ">$split_out1[0]" . "_trim_single.txt" or die $!;
-open SINGLE2, ">$split_out2[0]" . "_trim_single.txt" or die $!;
+$out_dir = dirname($read1);
+$prefix = basename($read1);
+
+# Make Singletons Directory
+system("mkdir -p $out_dir/singletons/");
+open SINGLETONS, ">$out_dir/singletons/$prefix" . "_trim_single.txt" or die $!;
 
 while ( $read1_line = <READ1> ) {
     chomp($read1_line);
@@ -75,10 +79,10 @@ while ( $read1_line = <READ1> ) {
 
     # Print Singletons
     if ( $line1[8] eq "0" ) {
-        print SINGLE2 join( "\t", @line2 ) . "\n";
+        print SINGLETONS join( "\t", @line2 ) . "\n";
     }
     elsif ( $line2[8] eq "0" ) {
-        print SINGLE1 join( "\t", @line1 ) . "\n";
+        print SINGLETONS join( "\t", @line1 ) . "\n";
     }
     # Or, print entire thing (interleaved QSEQ)
     else {
