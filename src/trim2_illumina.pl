@@ -82,8 +82,26 @@ while ( $read1_line = <READ1> ) {
     }
     # Or, print entire thing (interleaved QSEQ)
     else {
-        print join( "\t", @line1 ) . "\n" . join( "\t", @line2 ) . "\n";
-    }
+       # Print in QSEQ format, uncomment (and comment FASTQ line)
+       # print join( "\t", @line1 ) . "\n" . join( "\t", @line2 ) . "\n";
+
+       # Print in FASTQ (interleaved) format:
+       # TODO shorten this!
+       $header = join(':', @line1[0..7]);
+       $sequence_quality = @line1[8];
+       @sq = split( /\t/, $sequence_quality);
+       $sequence = @sq[0];
+       $quality = @sq[1];
+       print "\@$header:A\n$sequence\n\+$header:A\n$quality\n";
+
+       $header = join(':', @line2[0..7]);
+       $sequence_quality = @line2[8];
+       @sq = split( /\t/, $sequence_quality);
+       $sequence = @sq[0];
+       $quality = @sq[1];
+       print "\@$header:B\n$sequence\n\+$header:B\n$quality\n";
+
+    } 
 }
 
 close SINGLE1;
@@ -120,7 +138,10 @@ sub trim() {
     }
 
     $seq = substr( $seq, $start, $end - $start );
+    
     return 0 if ( length($seq) < $LENGTH_CUTOFF );
+    
     $seq = $seq . "\t" . substr( $qual, $start, $end - $start );
+    
     return $seq;
 }
