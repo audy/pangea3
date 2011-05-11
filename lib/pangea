@@ -204,14 +204,6 @@ count_phylogenies () { # Runs phylocount.py
   done
 }
 
-make_megaclustables () { # Makes Megaclust Tables
-  title "Megaclustableing with $megaclustable"
-  table_dir=$1 # where they're from
-  out_dir=$2 # where they go, appended to $tables
-
-}
-
-
 megaclustable() { # Runs megaclustable.pl
     sim=$1
     t=$2
