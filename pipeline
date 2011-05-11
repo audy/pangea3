@@ -14,9 +14,12 @@ source './config'
 pang3a () {
   initialize!
 
+  SIMILARITIES='80 90 95 99' # Levels to filter at!
+  DRY_RUN=false # Leave blank to run for reals.
+
   trim
 
-  reference_assemble
+  reference_assemble_clc
 
   filter
 
@@ -28,7 +31,14 @@ pang3a () {
 
   count_phylogenies $tables
 
-  make_megaclustables $tables $dir
+  megaclustable 99 6 species $tables $dir
+  megaclustable 95 5 genus $tables $dir
+  megaclustable 90 4 family $tables $dir
+  megaclustable 90 3 order $tables $dir
+  megaclustable 90 2 class $tables $dir
+  megaclustable 80 1 phylum $tables $dir
+  megaclustable 80 0 domain $tables $dir
+
 
   run_shannon
   
