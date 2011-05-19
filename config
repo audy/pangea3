@@ -38,8 +38,7 @@ clc_out=$1/clc_out # where CLC's output goes
 tables=$1/tables # where the tables go
 database=$2 # the RDP database
 shannon_reads=$3 # number of reads for Shannon-Diversity Index
-run=$4 # This gets added to the headers of the unmatched reads (ugly patch)
 unassembled=$1/reads/unassembled # Where unassembled reads are kept
 logfile=$dir/log.txt
-
+email_address=$4 # to email yourself!
 # ---------------------------------------------------------------------------

@@ -2,10 +2,18 @@
 
 # Tons of hacky obfuscated methods used by ribopipe!
 initialize! () {
+  # Check arguments
+  #if [ $# -ne 4 ]
+  #then
+  #  echo "usage: ./pang3a directory/ rdp.fa shannon_reads email_address"
+  #  echo "put 0 for shannon_reads if you want to skip that step"
+  #  exit
+  #fi
+
   title "$(date)"
+  status "USER = $email_address"
   status "DIR = $dir"
   status "READS = $reads"
-  status "RUN = $run"
   status "CLC_OUT = $clc_out"
   status "TABLES = $tables"
   status "DATABASE = $database"
@@ -48,7 +56,7 @@ cluster_unassembled () { # Cluster unassembled with cd-hit
   
   separate_unassembled
   
-  cluster $unassembled
+#  cluster $unassembled
   
   make_cluster_tables
 
