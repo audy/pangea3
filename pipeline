@@ -1,0 +1,49 @@
+#!/bin/bash +xe
+source './lib/pangea'
+source './config'
+
+#                            .----.       
+#                            `--  ;       
+#   .---.  .--.  ,-.,-. .--.  .' '  .--.  
+#   : .; `' .; ; : ,. :' .; : _`,`.' .; ; 
+#   : ._.'`.__,_;:_;:_;`._. ;`.__.'`.__,_;
+#   : :                 .-. :             
+#   :_;                 `._.'
+
+
+pang3a () {
+  initialize!
+
+  SIMILARITIES='80 90 95 99' # Levels to filter at!
+  DRY_RUN=false # Leave blank to run for reals.
+
+  trim
+
+  reference_assemble_clc
+
+  filter
+
+  separate_unassembled
+
+  cluster_unassembled
+
+  generate_tables  
+
+  count_phylogenies $tables
+
+  megaclustable 99 6 species $tables $dir
+  megaclustable 95 5 genus $tables $dir
+  megaclustable 90 4 family $tables $dir
+  megaclustable 90 3 order $tables $dir
+  megaclustable 90 2 class $tables $dir
+  megaclustable 80 1 phylum $tables $dir
+  megaclustable 80 0 domain $tables $dir
+
+
+  run_shannon
+  
+  title "$(date)."
+}
+
+
+pang3a
