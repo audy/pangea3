@@ -4,7 +4,9 @@
 cdhit_overhang="78" # Minimum CDHIT overlap
 clust_min='10' # Minimum number of reads per cluster
 
-if DRY_RUN
+DRY_RUN=false
+
+if $DRY_RUN
     then
     run='echo'
 else

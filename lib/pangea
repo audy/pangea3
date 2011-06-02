@@ -57,7 +57,7 @@ cluster_unassembled () { # Cluster unassembled with cd-hit
   
   separate_unassembled
   
-#  cluster $unassembled
+  cluster $unassembled
   
   make_cluster_tables
 
@@ -69,7 +69,7 @@ reference_assemble_clc () { # Run CLC Reference Assembler
   for file in $reads/*.txt
   do
     status "Assembling $(basename $file) against $database"
-    $clc_ assemble -o "$clc_out/$(basename $file).out" \
+    $clc_assemble -o "$clc_out/$(basename $file).out" \
       -r random \
       -a global \
       -q -p fb ss 0 500 "$file" \
@@ -135,8 +135,8 @@ separate_unassembled () { # Separates unassembled reads
       status "Separating $(basename $file) @ $sim"
       # Output unassembled reads for each percent similarity
 
-      #rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
-      #rm -f $unassembled/unassembled_"$sim".fa # Clean
+      rm -f $unassembled/L_98_S_$sim/$(basename $file).fa # CLC appends :\
+      rm -f $unassembled/unassembled_"$sim".fa # Clean
 
       mkdir -p $unassembled/L_98_S_$sim
       $unassembled_reads \

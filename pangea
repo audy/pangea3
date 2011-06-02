@@ -19,10 +19,10 @@ pang3a () {
     initialize!
 
     # Trims reads in raw_reads, places them in reads/
-    trim
+#    trim
 
     # Reference assembles to specified database (taxcollector)
-    reference_assemble
+    reference_assemble_clc
 
     # Filters reads based on quality scores
     filter
