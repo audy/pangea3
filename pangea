@@ -22,24 +22,24 @@ pang3a () {
 #    trim
 
     # Reference assembles to specified database (taxcollector)
-    reference_assemble_clc
+#    reference_assemble_clc
 
     # Filters reads based on quality scores
-    filter
+#    filter
 
     # Separate unassembled reads for clustering
-    separate_unassembled
+#    separate_unassembled
 
     # Clusters unassembled reads, & generates tables.
-    cluster_unassembled
+#    cluster_unassembled
 
     # Generates tables from filtered CLC reference assembly
-    generate_tables  
+#    generate_tables  
 
     # Runs "phylocount.py" which counts number of _reads_ per OTU
     # at each taxonomic level. Combined w/ cluster output to generate
     # megaclustables.
-    count_phylogenies $tables
+#    count_phylogenies $tables
  
     # Generates OTU abundancy matrix from Phylo Tables and Cluster Tables
     # This is the final output of the pipeline.
@@ -47,18 +47,18 @@ pang3a () {
     # People usually put these in Excel.
     # To do this type: "pbpaste tables/species.txt | pbcopy" and then paste
     # into Excel.
-    make_megaclustables $tables $dir
+#    make_megaclustables $tables $dir
 
     # Shannon-Diversity Index. Currently does not work.
     # Uncomment the next line to try anyway
-    # run_shannon
+     run_shannon
 
     # just prints out when the pipeline is finished
-    title "$(date)."
+#    title "$(date)."
 
     # Email yourself when the pipeline is finished:
     # Only works for @ufl.edu email addresses!
-    echo "pipeline is done!" | mail -s 'pang3a finished' $email_address 
+#    echo "pipeline is done!" | mail -s 'pang3a finished' $email_address 
 
 }
 

@@ -13,8 +13,6 @@ else
     run=''
 fi
 
-SIMILARITIES=80 90 95 99
-
 # So you can manually specify which python/perl you want to use.
 python=$(which python)
 perl=$(which perl)

@@ -46,11 +46,25 @@ s = "%s_L_%s_B_%s_%s"
 cmd = "$trim -a $(dirname $file)/%s.%s -b $(dirname $file)/%s.%s > %s" %\
     (s % (run, lane, barcode, 1), ext, s % (run, lane, barcode, 3), ext, "$reads/$(basename $file)".replace('_1.txt', '.txt'))
 os.system(cmd)
-EOF
-)
+EOF)
 status $file
 done
 
+}
+
+make_megaclustables () { # Makes Megaclust Tables
+  title "Megaclustableing with $megaclustable"
+  
+  table_dir=$1 # where they're from
+  out_dir=$2 # where they go, appended to $tables
+  
+  megaclustable 99 6 species $table_dir $out_dir
+  megaclustable 95 5 genus $table_dir $out_dir
+  megaclustable 90 4 family $table_dir $out_dir
+  megaclustable 90 3 order $table_dir $out_dir
+  megaclustable 90 2 class $table_dir $out_dir
+  megaclustable 80 1 phylum $table_dir $out_dir
+  megaclustable 80 0 domain $table_dir $out_dir
 }
 
 cluster_unassembled () { # Cluster unassembled with cd-hit
