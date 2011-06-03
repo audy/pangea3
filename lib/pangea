@@ -90,7 +90,7 @@ reference_assemble_blast () { # Run BLAST
 
 filter () { # Filters CLC assembly output based on percent similarity
   title "Filtering with $filter"
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     for file in $clc_out/*.out
     do     
@@ -106,7 +106,7 @@ filter () { # Filters CLC assembly output based on percent similarity
 
 generate_tables () { # Generates CLC Tables
   title "Generating tables with $make_tables"
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
@@ -128,7 +128,7 @@ separate_unassembled () { # Separates unassembled reads
 
   rm -rf $unassembled/L_98_S_$sim/$.fa # CLC appends :\
   
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     for file in $clc_out/L_98_S_$sim/*.filtered
     do
@@ -166,7 +166,7 @@ cluster () { # Clusters unassembled reads
   status "Overhang = $cdhit_overhang"
   status "Wordsize = $wordsize"
   
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     input=$directory/join_unassembled_$sim.fa
     output=$directory/clustered_$sim.fa
@@ -189,7 +189,7 @@ cluster () { # Clusters unassembled reads
 make_cluster_tables () { # Makes tables similar to phylocount from clusters
   title "Building cluster tables"
   
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     file=$unassembled/clustered_$sim.fa.clstr
     status "Counting $file"
@@ -201,7 +201,7 @@ count_phylogenies () { # Runs phylocount.py
   title "Summing up phylogenies with $count_phyl"
   table_dir=$1
   
-  for sim in SIMILARITIES
+  for sim in {80,90,95,99}
   do
     for file in $table_dir/L_98_S_$sim/*.table
     do
@@ -236,7 +236,7 @@ run_shannon () { # The shannon-diversity index
   
   make_shannon_tables () {
     # Make Shannon Tables!
-    for sim in SIMILARITIES
+    for sim in {80,90,95,99}
     do
       mkdir -p $tables/shannon/L_98_S_$sim
       for file in $tables/L_98_S_$sim/*.table
@@ -254,7 +254,7 @@ run_shannon () { # The shannon-diversity index
     mkdir -p $tables/shannon/unassembled
     for file in $reads/*.txt
     do
-      for sim in SIMILARITIES
+      for sim in {80,90,95,99}
       do
         echo $file, $sim
         mkdir -p $tables/shannon/unassembled/L_98_S_$sim
@@ -270,7 +270,7 @@ run_shannon () { # The shannon-diversity index
 
   # concatenate unassembled reads
   cluster () {
-    for sim in SIMILARITIES
+    for sim in {80,90,95,99}
     do
       rm -f $tables/shannon/unassembled/unassembled_$sim.txt
       status "Concatenating unassembled @ $sim"
@@ -297,7 +297,7 @@ run_shannon () { # The shannon-diversity index
   hybrid_table () {
     CUTOFF=1
     # Run Megaclustable-like script    
-    for sim in SIMILARITIES
+    for sim in {80,90,95,99}
     do
       status "count clusters, $sim"
       python src/count_clusters.py \
