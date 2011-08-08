@@ -31,25 +31,23 @@ barcodes = sorted(max(counts.values(), key=len).keys())
 
 print "\t",
 for lane_barcode in barcodes:
-    run, lane, barcode = lane_barcode.split('.')
+    run, barcode, lane = lane_barcode.split('.')
     lane = int(lane)
     barcode = int(barcode)
     print "%s_L_%s_B_%.3i\t" % (run, lane, barcode),
 print ''
 
-    
-# Print table values
+# sort clusters by sum of reads
+# edit: not really
+sorted_clusters = counts.keys()
 
-for cluster in counts:
+# Print table values
+for cluster in sorted_clusters:
 
     if sum(counts[cluster].values()) < cutoff:
         continue
     print "%s\t" % cluster,
     for lane_barcode in barcodes:
-        try:
-            val = counts[cluster][lane_barcode]
-        except KeyError:
-            val = '0'
-        print "%s\t" % val,
+        print "%s\t" % counts[cluster].get(lane_barcode, 0),
     print ''
 print ''

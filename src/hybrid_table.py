@@ -13,7 +13,6 @@ for filename in [first, second]:
     print >> sys.stderr, first, second
     with open(filename) as handle:
         headers = handle.next().strip().split('\t')
-        print >> sys.stderr, headers
 
         [ all_headers.add(i) for i in headers ]
             
@@ -22,7 +21,7 @@ for filename in [first, second]:
             x = line[0]
             for h, c in zip(headers, line[1:]):
                 h = headers.index(h)
-                merged_table[x][headers[h]] = c
+                merged_table[x][headers[h]] = int(c)
 
 
 sorted_headers = sorted(all_headers)
