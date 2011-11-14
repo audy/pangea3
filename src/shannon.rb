@@ -3,8 +3,8 @@
 handle = File.open(ARGV[0])
 
 # skip header
-handle.gets
-#!/usr/bin/env ruby
+header = handle.gets
+
 # read in numbers
 rows = handle.each.collect do |line|
   line = line.strip.split("\t")
