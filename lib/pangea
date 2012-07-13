@@ -222,7 +222,8 @@ count_phylogenies () { # Runs phylocount.py
     do
       status "Counting $(basename $file) @ $sim%"
       $count_phyl $database $file
-      cat $file.paired.out $file.unpaired.out > $file.both.out
+      # for when we were counting both paired and unpaired matches
+      #cat $file.paired.out $file.unpaired.out > $file.both.out
      done
   done
 }
@@ -239,7 +240,7 @@ megaclustable() { # Runs megaclustable.pl
     status "out = $out"
     status "$tables/$out_dir/$out.txt"
     $megaclustable \
-      -m $(ls -m $table_dir/L_98_S_$sim/*.both.* | tr -d ',\n') \
+      -m $(ls -m $table_dir/L_98_S_$sim/*paired* | tr -d ',\n') \
       -t $t \
       -o $out_dir/$out.txt
 }
